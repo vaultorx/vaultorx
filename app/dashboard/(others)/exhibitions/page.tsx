@@ -21,53 +21,8 @@ import {
   Settings,
   Share2,
 } from "lucide-react";
+import { exhibitions } from "@/lib/mocks";
 
-// Mock exhibitions data
-const mockExhibitions = [
-  {
-    id: "ex1",
-    title: "Digital Renaissance",
-    description:
-      "Exploring the intersection of classical art and digital technology",
-    status: "active",
-    startDate: "2024-02-01",
-    endDate: "2024-03-01",
-    location: "Virtual Gallery",
-    visitors: 12450,
-    featuredNFTs: 15,
-    totalNFTs: 45,
-    curator: "Your Profile",
-    image: "/placeholder.svg",
-  },
-  {
-    id: "ex2",
-    title: "Metaverse Art Week",
-    description: "A showcase of groundbreaking metaverse-native artworks",
-    status: "upcoming",
-    startDate: "2024-03-15",
-    endDate: "2024-04-15",
-    location: "Decentraland & Spatial",
-    visitors: 0,
-    featuredNFTs: 8,
-    totalNFTs: 25,
-    curator: "Your Profile",
-    image: "/placeholder.svg",
-  },
-  {
-    id: "ex3",
-    title: "Generative Art Symposium",
-    description: "Celebrating the art of code and algorithmic creativity",
-    status: "ended",
-    startDate: "2024-01-10",
-    endDate: "2024-01-25",
-    location: "Online Exhibition",
-    visitors: 8560,
-    featuredNFTs: 12,
-    totalNFTs: 30,
-    curator: "Your Profile",
-    image: "/placeholder.svg",
-  },
-];
 
 export default function ExhibitionsPage() {
   const [activeTab, setActiveTab] = useState("active");
@@ -89,7 +44,7 @@ export default function ExhibitionsPage() {
     }
   };
 
-  const filteredExhibitions = mockExhibitions.filter(
+  const filteredExhibitions = exhibitions.filter(
     (ex) => activeTab === "all" || ex.status === activeTab
   );
 

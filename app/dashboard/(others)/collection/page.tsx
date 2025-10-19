@@ -30,86 +30,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { collectionStats, nftItems } from "@/lib/mocks";
 
-// Mock collection data
-const mockCollections = [
-  {
-    id: "1",
-    name: "Digital Dreams",
-    description:
-      "A collection of surreal digital artworks exploring consciousness",
-    itemCount: 24,
-    floorPrice: 1.2,
-    totalVolume: 45.8,
-    blockchain: "Ethereum",
-    category: "Art",
-    image: "/placeholder.svg",
-    verified: true,
-  },
-  {
-    id: "2",
-    name: "Cosmic Evolution",
-    description: "Generative art depicting the evolution of cosmic entities",
-    itemCount: 50,
-    floorPrice: 0.85,
-    totalVolume: 32.1,
-    blockchain: "Polygon",
-    category: "Generative",
-    image: "/placeholder.svg",
-    verified: true,
-  },
-  {
-    id: "3",
-    name: "Urban Legends",
-    description: "Street art and graffiti-inspired digital collectibles",
-    itemCount: 12,
-    floorPrice: 2.5,
-    totalVolume: 18.9,
-    blockchain: "Ethereum",
-    category: "Photography",
-    image: "/placeholder.svg",
-    verified: false,
-  },
-];
-
-const mockNFTs = [
-  {
-    id: "1",
-    name: "Digital Dream #1",
-    collection: "Digital Dreams",
-    image: "/placeholder.svg",
-    price: 1.5,
-    lastSale: 1.2,
-    rarity: "Legendary",
-    likes: 142,
-    views: 2450,
-    createdAt: "2024-01-15",
-  },
-  {
-    id: "2",
-    name: "Cosmic Evolution #23",
-    collection: "Cosmic Evolution",
-    image: "/placeholder.svg",
-    price: 0.9,
-    lastSale: 0.85,
-    rarity: "Rare",
-    likes: 89,
-    views: 1560,
-    createdAt: "2024-01-10",
-  },
-  {
-    id: "3",
-    name: "Urban Legend #7",
-    collection: "Urban Legends",
-    image: "/placeholder.svg",
-    price: 3.2,
-    lastSale: 2.8,
-    rarity: "Epic",
-    likes: 203,
-    views: 3210,
-    createdAt: "2024-01-05",
-  },
-];
 
 export default function CollectionPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -118,7 +40,6 @@ export default function CollectionPage() {
 
   return (
     <div className="min-h-screen">
-
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
@@ -260,7 +181,7 @@ export default function CollectionPage() {
 
           <TabsContent value="collections" className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {mockCollections.map((collection) => (
+              {collectionStats.map((collection) => (
                 <Card
                   key={collection.id}
                   className="group cursor-pointer hover:shadow-lg transition-shadow"
@@ -331,7 +252,7 @@ export default function CollectionPage() {
                   : "space-y-4"
               }
             >
-              {mockNFTs.map((nft) => (
+              {nftItems.map((nft) => (
                 <Card
                   key={nft.id}
                   className={viewMode === "list" ? "flex items-center p-4" : ""}
@@ -351,7 +272,7 @@ export default function CollectionPage() {
                           <h3 className="font-semibold">{nft.name}</h3>
                           <Badge>{nft.rarity}</Badge>
                         </div>
-                        <p className="text-sm text-muted-foreground mb-3">
+                        {/* <p className="text-sm text-muted-foreground mb-3">
                           {nft.collection}
                         </p>
                         <div className="grid grid-cols-2 gap-2 text-sm">
@@ -363,7 +284,7 @@ export default function CollectionPage() {
                             <p className="text-muted-foreground">Last Sale</p>
                             <p className="font-semibold">{nft.lastSale} ETH</p>
                           </div>
-                        </div>
+                        </div> */}
                       </CardContent>
                     </>
                   ) : (
@@ -378,16 +299,16 @@ export default function CollectionPage() {
                               {nft.name}
                             </h3>
                             <p className="text-sm text-muted-foreground">
-                              {nft.collection}
+                              {nft.collection?.name}
                             </p>
                           </div>
                           <Badge className="ml-2">{nft.rarity}</Badge>
                         </div>
                         <div className="flex items-center gap-4 mt-2 text-sm">
-                          <span className="font-semibold">{nft.price} ETH</span>
-                          <span className="text-muted-foreground">
+                          <span className="font-semibold">{nft.collection?.floorPrice || 0} ETH</span>
+                          {/* <span className="text-muted-foreground">
                             Last: {nft.lastSale} ETH
-                          </span>
+                          </span> */}
                           <span className="text-muted-foreground">
                             {nft.likes} likes
                           </span>

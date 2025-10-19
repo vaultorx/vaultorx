@@ -29,62 +29,8 @@ import {
   RefreshCw,
   ExternalLink,
 } from "lucide-react";
+import { transactions } from "@/lib/mocks";
 
-// Mock transactions data
-const mockTransactions = [
-  {
-    id: "tx1",
-    type: "purchase",
-    nftName: "Digital Dream #1",
-    amount: 1.5,
-    currency: "ETH",
-    from: "0x1234...5678",
-    to: "0xabcd...efgh",
-    status: "completed",
-    timestamp: "2024-01-20 14:30:00",
-    txHash: "0x1234567890abcdef",
-    gasFee: 0.023,
-  },
-  {
-    id: "tx2",
-    type: "sale",
-    nftName: "Cosmic Evolution #23",
-    amount: 0.9,
-    currency: "ETH",
-    from: "0xabcd...efgh",
-    to: "0x1234...5678",
-    status: "completed",
-    timestamp: "2024-01-19 11:15:00",
-    txHash: "0xabcdef1234567890",
-    gasFee: 0.018,
-  },
-  {
-    id: "tx3",
-    type: "transfer",
-    nftName: "Urban Legend #7",
-    amount: 0,
-    currency: "ETH",
-    from: "0x1234...5678",
-    to: "0x9876...5432",
-    status: "completed",
-    timestamp: "2024-01-18 09:45:00",
-    txHash: "0x9876543210fedcba",
-    gasFee: 0.015,
-  },
-  {
-    id: "tx4",
-    type: "purchase",
-    nftName: "Digital Dream #5",
-    amount: 2.1,
-    currency: "ETH",
-    from: "0x5678...1234",
-    to: "0x1234...5678",
-    status: "pending",
-    timestamp: "2024-01-20 16:20:00",
-    txHash: "0x567890abcdef1234",
-    gasFee: 0.025,
-  },
-];
 
 export default function TransactionsPage() {
   const [selectedType, setSelectedType] = useState("all");
@@ -117,14 +63,15 @@ export default function TransactionsPage() {
     }
   };
 
-  const filteredTransactions = mockTransactions.filter((tx) => {
-    const matchesType = selectedType === "all" || tx.type === selectedType;
+  const filteredTransactions = transactions.filter((tx) => {
+    const matchesType =
+      selectedType === "all" || tx.transactionType === selectedType;
     const matchesStatus =
       selectedStatus === "all" || tx.status === selectedStatus;
     const matchesSearch =
       searchQuery === "" ||
-      tx.nftName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      tx.txHash.toLowerCase().includes(searchQuery.toLowerCase());
+      tx?.nftName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      tx.transactionHash.toLowerCase().includes(searchQuery.toLowerCase());
 
     return matchesType && matchesStatus && matchesSearch;
   });
@@ -270,9 +217,7 @@ export default function TransactionsPage() {
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="all">
-              <TabsList
-                className="grid grid-cols-4 gap-3 md:max-w-lg mb-4"
-              >
+              <TabsList className="grid grid-cols-4 gap-3 md:max-w-lg mb-4">
                 <TabsTrigger value="all">All Transactions</TabsTrigger>
                 <TabsTrigger value="purchases">Purchases</TabsTrigger>
                 <TabsTrigger value="sales">Sales</TabsTrigger>
@@ -296,22 +241,24 @@ export default function TransactionsPage() {
                       className="grid grid-cols-12 gap-4 p-4 border-b last:border-b-0 items-center"
                     >
                       <div className="col-span-2 flex items-center gap-2">
-                        {getTypeIcon(tx.type)}
-                        <span className="capitalize">{tx.type}</span>
+                        {getTypeIcon(tx.transactionType)}
+                        <span className="capitalize">{tx.transactionType}</span>
                       </div>
                       <div className="col-span-3">
                         <p className="font-medium">{tx.nftName}</p>
                         <p className="text-sm text-muted-foreground truncate">
-                          {tx.txHash}
+                          {tx.transactionHash}
                         </p>
                       </div>
                       <div className="col-span-2">
-                        <p className="font-semibold">
-                          {tx.amount > 0
-                            ? `${tx.amount} ${tx.currency}`
-                            : "Transfer"}
-                        </p>
-                        {tx.gasFee > 0 && (
+                        {tx.price && (
+                          <p className="font-semibold">
+                            {tx.price > 0
+                              ? `${tx.price} ${tx.currency}`
+                              : "Transfer"}
+                          </p>
+                        )}
+                        {tx.gasFee && tx.gasFee > 0 && (
                           <p className="text-xs text-muted-foreground">
                             Gas: {tx.gasFee} ETH
                           </p>
@@ -319,11 +266,14 @@ export default function TransactionsPage() {
                       </div>
                       <div className="col-span-2">
                         <p className="text-sm">
-                          {new Date(tx.timestamp).toLocaleDateString()}
+                          {new Date(tx.createdAt).toLocaleDateString()}
                         </p>
+                        {tx.confirmedAt && (
+
                         <p className="text-xs text-muted-foreground">
-                          {new Date(tx.timestamp).toLocaleTimeString()}
+                          {new Date(tx.confirmedAt).toLocaleTimeString()}
                         </p>
+                        )}
                       </div>
                       <div className="col-span-2">
                         <Badge className={getStatusColor(tx.status)}>

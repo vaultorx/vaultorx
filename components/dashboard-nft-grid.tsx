@@ -26,7 +26,7 @@ export function DashboardNFTGrid({ ownedNFTs, listedNFTs }: DashboardNFTGridProp
 
           <TabsContent value="owned" className="mt-6">
             {ownedNFTs.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 items-stretch">
                 {ownedNFTs.map((nft) => (
                   <NFTCard key={nft.id} nft={nft} />
                 ))}
@@ -41,7 +41,7 @@ export function DashboardNFTGrid({ ownedNFTs, listedNFTs }: DashboardNFTGridProp
 
           <TabsContent value="listed" className="mt-6">
             {listedNFTs.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 items-stretch">
                 {listedNFTs.map((nft) => (
                   <NFTCard key={nft.id} nft={nft} />
                 ))}

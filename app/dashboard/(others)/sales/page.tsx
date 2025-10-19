@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Header } from "@/components/header";
 import {
   Card,
   CardContent,
@@ -20,57 +19,9 @@ import {
   BarChart3,
   Target,
 } from "lucide-react";
+import { activeListings, salesRecords } from "@/lib/mocks";
 
-// Mock sales data
-const mockSales = [
-  {
-    id: "s1",
-    nftName: "Digital Dream #1",
-    collection: "Digital Dreams",
-    salePrice: 1.5,
-    previousPrice: 1.2,
-    saleDate: "2024-01-20",
-    buyer: "0x1234...5678",
-    royalty: 0.075,
-    status: "completed",
-  },
-  {
-    id: "s2",
-    nftName: "Cosmic Evolution #23",
-    collection: "Cosmic Evolution",
-    salePrice: 0.9,
-    previousPrice: 0.85,
-    saleDate: "2024-01-19",
-    buyer: "0xabcd...efgh",
-    royalty: 0.045,
-    status: "completed",
-  },
-];
 
-const mockListings = [
-  {
-    id: "l1",
-    nftName: "Urban Legend #7",
-    collection: "Urban Legends",
-    listPrice: 3.2,
-    floorPrice: 2.5,
-    duration: "7 days",
-    views: 3210,
-    likes: 203,
-    status: "active",
-  },
-  {
-    id: "l2",
-    nftName: "Digital Dream #5",
-    collection: "Digital Dreams",
-    listPrice: 2.1,
-    floorPrice: 1.2,
-    duration: "30 days",
-    views: 1560,
-    likes: 89,
-    status: "active",
-  },
-];
 
 const salesStats = {
   totalSales: 2.4,
@@ -206,7 +157,7 @@ export default function SalesPage() {
           {/* Active Listings */}
           <TabsContent value="listings">
             <div className="grid gap-6">
-              {mockListings.map((listing) => (
+              {activeListings.map((listing) => (
                 <Card key={listing.id}>
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
@@ -276,7 +227,7 @@ export default function SalesPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {mockSales.map((sale) => (
+                  {salesRecords.map((sale) => (
                     <div
                       key={sale.id}
                       className="flex items-center justify-between p-4 border rounded-lg"
