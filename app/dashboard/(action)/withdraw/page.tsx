@@ -1,18 +1,38 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Header } from "@/components/header"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Badge } from "@/components/ui/badge"
-import { Checkbox } from "@/components/ui/checkbox"
-import { SUPPORTED_BLOCKCHAINS } from "@/lib/constants"
-import { AlertTriangle, ArrowLeft, CheckCircle2, Loader2, Shield, Clock, Plus } from "lucide-react"
-import Link from "next/link"
+import { useState } from "react";
+import { Header } from "@/components/header";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import { SUPPORTED_BLOCKCHAINS } from "@/lib/constants";
+import {
+  AlertTriangle,
+  ArrowLeft,
+  CheckCircle2,
+  Loader2,
+  Shield,
+  Clock,
+  Plus,
+} from "lucide-react";
+import Link from "next/link";
 import {
   Dialog,
   DialogContent,
@@ -20,27 +40,27 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 
 interface WhitelistedAddress {
-  id: string
-  address: string
-  label: string
-  addedAt: Date
-  lockUntil?: Date
+  id: string;
+  address: string;
+  label: string;
+  addedAt: Date;
+  lockUntil?: Date;
 }
 
 export default function WithdrawPage() {
-  const [selectedNFT, setSelectedNFT] = useState("")
-  const [destinationNetwork, setDestinationNetwork] = useState("")
-  const [destinationAddress, setDestinationAddress] = useState("")
-  const [verificationCode, setVerificationCode] = useState("")
-  const [withdrawalFee, setWithdrawalFee] = useState("0.005")
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [withdrawalComplete, setWithdrawalComplete] = useState(false)
-  const [codeSent, setCodeSent] = useState(false)
-  const [useWhitelisted, setUseWhitelisted] = useState(false)
-  const [twoFactorEnabled] = useState(true)
+  const [selectedNFT, setSelectedNFT] = useState("");
+  const [destinationNetwork, setDestinationNetwork] = useState("");
+  const [destinationAddress, setDestinationAddress] = useState("");
+  const [verificationCode, setVerificationCode] = useState("");
+  const [withdrawalFee, setWithdrawalFee] = useState("0.005");
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [withdrawalComplete, setWithdrawalComplete] = useState(false);
+  const [codeSent, setCodeSent] = useState(false);
+  const [useWhitelisted, setUseWhitelisted] = useState(false);
+  const [twoFactorEnabled] = useState(true);
 
   // Mock whitelisted addresses
   const [whitelistedAddresses] = useState<WhitelistedAddress[]>([
@@ -57,25 +77,25 @@ export default function WithdrawPage() {
       addedAt: new Date(Date.now() - 12 * 60 * 60 * 1000), // 12 hours ago
       lockUntil: new Date(Date.now() + 12 * 60 * 60 * 1000), // Locked for 12 more hours
     },
-  ])
+  ]);
 
   const handleSendCode = () => {
-    setCodeSent(true)
+    setCodeSent(true);
     // Simulate sending verification code
-  }
+  };
 
   const handleWithdraw = async () => {
-    setIsProcessing(true)
+    setIsProcessing(true);
     // Simulate withdrawal process
     setTimeout(() => {
-      setIsProcessing(false)
-      setWithdrawalComplete(true)
-    }, 3000)
-  }
+      setIsProcessing(false);
+      setWithdrawalComplete(true);
+    }, 3000);
+  };
 
   const isAddressLocked = (address: WhitelistedAddress) => {
-    return address.lockUntil && address.lockUntil > new Date()
-  }
+    return address.lockUntil && address.lockUntil > new Date();
+  };
 
   if (withdrawalComplete) {
     return (
@@ -149,22 +169,27 @@ export default function WithdrawPage() {
           <Card>
             <CardHeader>
               <CardTitle>Withdraw NFT</CardTitle>
-              <CardDescription>Transfer your NFT from Opuxvault to an external wallet</CardDescription>
+              <CardDescription>
+                Transfer your NFT from Vaultorx to an external wallet
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Security Notice */}
               <Alert>
                 <Shield className="h-4 w-4" />
                 <AlertDescription>
-                  <strong>Security Enabled:</strong> This withdrawal requires email verification
-                  {twoFactorEnabled && " and 2FA authentication"} to protect your assets.
+                  <strong>Security Enabled:</strong> This withdrawal requires
+                  email verification
+                  {twoFactorEnabled && " and 2FA authentication"} to protect
+                  your assets.
                 </AlertDescription>
               </Alert>
 
               {/* Select NFT */}
               <div className="space-y-2">
                 <Label htmlFor="nft">
-                  Select NFT to Withdraw <span className="text-destructive">*</span>
+                  Select NFT to Withdraw{" "}
+                  <span className="text-destructive">*</span>
                 </Label>
                 <Select value={selectedNFT} onValueChange={setSelectedNFT}>
                   <SelectTrigger id="nft">
@@ -181,9 +206,13 @@ export default function WithdrawPage() {
               {/* Destination Network */}
               <div className="space-y-2">
                 <Label htmlFor="dest-network">
-                  Destination Network <span className="text-destructive">*</span>
+                  Destination Network{" "}
+                  <span className="text-destructive">*</span>
                 </Label>
-                <Select value={destinationNetwork} onValueChange={setDestinationNetwork}>
+                <Select
+                  value={destinationNetwork}
+                  onValueChange={setDestinationNetwork}
+                >
                   <SelectTrigger id="dest-network">
                     <SelectValue placeholder="Select destination blockchain" />
                   </SelectTrigger>
@@ -202,7 +231,9 @@ export default function WithdrawPage() {
                 <Checkbox
                   id="use-whitelist"
                   checked={useWhitelisted}
-                  onCheckedChange={(checked) => setUseWhitelisted(checked as boolean)}
+                  onCheckedChange={(checked) =>
+                    setUseWhitelisted(checked as boolean)
+                  }
                 />
                 <Label htmlFor="use-whitelist" className="cursor-pointer">
                   Use whitelisted address
@@ -216,7 +247,11 @@ export default function WithdrawPage() {
                     <Label>Whitelisted Addresses</Label>
                     <Dialog>
                       <DialogTrigger asChild>
-                        <Button variant="outline" size="sm" className="gap-2 bg-transparent">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="gap-2 bg-transparent"
+                        >
                           <Plus className="h-3 w-3" />
                           Add Address
                         </Button>
@@ -225,7 +260,8 @@ export default function WithdrawPage() {
                         <DialogHeader>
                           <DialogTitle>Add Whitelisted Address</DialogTitle>
                           <DialogDescription>
-                            New addresses will be locked for 24 hours before they can be used for withdrawals.
+                            New addresses will be locked for 24 hours before
+                            they can be used for withdrawals.
                           </DialogDescription>
                         </DialogHeader>
                         <div className="space-y-4 mt-4">
@@ -245,27 +281,34 @@ export default function WithdrawPage() {
 
                   <div className="space-y-2">
                     {whitelistedAddresses.map((addr) => {
-                      const locked = isAddressLocked(addr)
+                      const locked = isAddressLocked(addr);
                       return (
                         <button
                           key={addr.id}
-                          onClick={() => !locked && setDestinationAddress(addr.address)}
+                          onClick={() =>
+                            !locked && setDestinationAddress(addr.address)
+                          }
                           disabled={locked}
                           className={`w-full p-4 border border-border rounded-lg text-left transition-colors ${
                             locked
                               ? "opacity-50 cursor-not-allowed"
                               : destinationAddress === addr.address
-                                ? "bg-primary/10 border-primary"
-                                : "hover:bg-muted/50"
+                              ? "bg-primary/10 border-primary"
+                              : "hover:bg-muted/50"
                           }`}
                         >
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex-1 min-w-0">
                               <p className="font-medium mb-1">{addr.label}</p>
-                              <p className="text-xs font-mono text-muted-foreground truncate">{addr.address}</p>
+                              <p className="text-xs font-mono text-muted-foreground truncate">
+                                {addr.address}
+                              </p>
                             </div>
                             {locked && (
-                              <Badge variant="secondary" className="gap-1 flex-shrink-0">
+                              <Badge
+                                variant="secondary"
+                                className="gap-1 flex-shrink-0"
+                              >
                                 <Clock className="h-3 w-3" />
                                 Locked
                               </Badge>
@@ -273,11 +316,16 @@ export default function WithdrawPage() {
                           </div>
                           {locked && addr.lockUntil && (
                             <p className="text-xs text-muted-foreground mt-2">
-                              Available in {Math.ceil((addr.lockUntil.getTime() - Date.now()) / (1000 * 60 * 60))} hours
+                              Available in{" "}
+                              {Math.ceil(
+                                (addr.lockUntil.getTime() - Date.now()) /
+                                  (1000 * 60 * 60)
+                              )}{" "}
+                              hours
                             </p>
                           )}
                         </button>
-                      )
+                      );
                     })}
                   </div>
                 </div>
@@ -288,7 +336,8 @@ export default function WithdrawPage() {
                 <>
                   <div className="space-y-2">
                     <Label htmlFor="dest-address">
-                      Destination Address <span className="text-destructive">*</span>
+                      Destination Address{" "}
+                      <span className="text-destructive">*</span>
                     </Label>
                     <Input
                       id="dest-address"
@@ -297,15 +346,17 @@ export default function WithdrawPage() {
                       onChange={(e) => setDestinationAddress(e.target.value)}
                     />
                     <p className="text-xs text-muted-foreground">
-                      Enter the wallet address where you want to receive your NFT
+                      Enter the wallet address where you want to receive your
+                      NFT
                     </p>
                   </div>
 
                   <Alert>
                     <AlertTriangle className="h-4 w-4" />
                     <AlertDescription>
-                      Double-check the destination address. Sending to an incorrect address will result in permanent
-                      loss of your NFT.
+                      Double-check the destination address. Sending to an
+                      incorrect address will result in permanent loss of your
+                      NFT.
                     </AlertDescription>
                   </Alert>
                 </>
@@ -314,11 +365,15 @@ export default function WithdrawPage() {
               {/* Withdrawal Fee */}
               <div className="bg-muted rounded-lg p-4">
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm text-muted-foreground">Withdrawal Fee</span>
+                  <span className="text-sm text-muted-foreground">
+                    Withdrawal Fee
+                  </span>
                   <span className="font-medium">{withdrawalFee} ETH</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Estimated Time</span>
+                  <span className="text-sm text-muted-foreground">
+                    Estimated Time
+                  </span>
                   <span className="font-medium">2-5 minutes</span>
                 </div>
               </div>
@@ -328,7 +383,8 @@ export default function WithdrawPage() {
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="verification">
-                      Email Verification Code <span className="text-destructive">*</span>
+                      Email Verification Code{" "}
+                      <span className="text-destructive">*</span>
                     </Label>
                     <div className="flex gap-2">
                       <Input
@@ -338,7 +394,12 @@ export default function WithdrawPage() {
                         onChange={(e) => setVerificationCode(e.target.value)}
                         maxLength={6}
                       />
-                      <Button variant="outline" onClick={handleSendCode} disabled={codeSent} className="bg-transparent">
+                      <Button
+                        variant="outline"
+                        onClick={handleSendCode}
+                        disabled={codeSent}
+                        className="bg-transparent"
+                      >
                         {codeSent ? "Code Sent" : "Send Code"}
                       </Button>
                     </div>
@@ -353,7 +414,11 @@ export default function WithdrawPage() {
                     className="w-full"
                     size="lg"
                     onClick={handleWithdraw}
-                    disabled={!verificationCode || verificationCode.length !== 6 || isProcessing}
+                    disabled={
+                      !verificationCode ||
+                      verificationCode.length !== 6 ||
+                      isProcessing
+                    }
                   >
                     {isProcessing ? (
                       <>
@@ -371,5 +436,5 @@ export default function WithdrawPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

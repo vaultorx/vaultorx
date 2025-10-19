@@ -1,6 +1,5 @@
 "use client"
 
-import { Header } from "@/components/header"
 import { DashboardStats } from "@/components/dashboard-stats"
 import { DashboardQuickActions } from "@/components/dashboard-quick-actions"
 import { DashboardRecentActivity } from "@/components/dashboard-recent-activity"
@@ -78,7 +77,6 @@ const mockListedNFTs: NFTItem[] = Array.from({ length: 4 }, (_, i) => ({
 export default function DashboardPage() {
   return (
     <div className="min-h-screen">
-      <Header />
 
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">

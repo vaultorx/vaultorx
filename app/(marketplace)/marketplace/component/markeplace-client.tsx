@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   SortAsc,
@@ -10,6 +10,7 @@ import { CompactNFTCard } from "@/components/compact-card";
 import { motion, AnimatePresence } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { mockNFTs } from "@/static-data/markeplace.mock";
+import { useSearchParams } from "next/navigation";
 
 const SORT_OPTIONS = [
   { value: "recent", label: "Recently Listed" },
@@ -25,6 +26,17 @@ export default function MarketplaceClient() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showSortDropdown, setShowSortDropdown] = useState(false);
 
+  
+  const searchParams = useSearchParams();
+
+  // Read search query from URL on component mount
+  useEffect(() => {
+    const search = searchParams.get("search");
+    if (search) {
+      setSearchQuery(decodeURIComponent(search));
+    }
+  }, [searchParams]);
+
   // Filter and sort NFTs
   const filteredNFTs = useMemo(() => {
     let filtered = mockNFTs;
@@ -37,6 +49,8 @@ export default function MarketplaceClient() {
           nft.collection?.name.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
+
+    
 
     // Sort
     switch (sortBy) {

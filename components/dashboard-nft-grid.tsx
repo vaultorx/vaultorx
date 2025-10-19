@@ -19,7 +19,7 @@ export function DashboardNFTGrid({ ownedNFTs, listedNFTs }: DashboardNFTGridProp
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="owned" className="w-full">
-          <TabsList className="grid w-full max-w-md grid-cols-2">
+          <TabsList className="grid w-full max-w-md grid-cols-2 gap-3">
             <TabsTrigger value="owned">Owned ({ownedNFTs.length})</TabsTrigger>
             <TabsTrigger value="listed">Listed ({listedNFTs.length})</TabsTrigger>
           </TabsList>

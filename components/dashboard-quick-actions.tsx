@@ -12,7 +12,7 @@ export function DashboardQuickActions() {
         <CardTitle>Quick Actions</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
           <Button variant="outline" className="h-auto flex-col gap-2 py-4 bg-transparent" asChild>
             <Link href="/dashboard/create">
               <Plus className="h-5 w-5" />
@@ -34,10 +34,10 @@ export function DashboardQuickActions() {
             </Link>
           </Button>
 
-          <Button variant="outline" className="h-auto flex-col gap-2 py-4 bg-transparent">
+          {/* <Button variant="outline" className="h-auto flex-col gap-2 py-4 bg-transparent">
             <ArrowUpDown className="h-5 w-5" />
             <span className="text-sm">Transfer</span>
-          </Button>
+          </Button> */}
         </div>
       </CardContent>
     </Card>

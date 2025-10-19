@@ -1,52 +1,70 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Header } from "@/components/header"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Badge } from "@/components/ui/badge"
-import { SUPPORTED_BLOCKCHAINS } from "@/lib/constants"
-import { AlertTriangle, ArrowLeft, CheckCircle2, Loader2, Info } from "lucide-react"
-import Link from "next/link"
+import { useState } from "react";
+import { Header } from "@/components/header";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { SUPPORTED_BLOCKCHAINS } from "@/lib/constants";
+import {
+  AlertTriangle,
+  ArrowLeft,
+  CheckCircle2,
+  Loader2,
+  Info,
+} from "lucide-react";
+import Link from "next/link";
 
 export default function DepositPage() {
-  const [selectedNetwork, setSelectedNetwork] = useState("")
-  const [nftContractAddress, setNftContractAddress] = useState("")
-  const [tokenId, setTokenId] = useState("")
-  const [isVerifying, setIsVerifying] = useState(false)
-  const [isDepositing, setIsDepositing] = useState(false)
-  const [depositComplete, setDepositComplete] = useState(false)
+  const [selectedNetwork, setSelectedNetwork] = useState("");
+  const [nftContractAddress, setNftContractAddress] = useState("");
+  const [tokenId, setTokenId] = useState("");
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [isDepositing, setIsDepositing] = useState(false);
+  const [depositComplete, setDepositComplete] = useState(false);
   const [verificationResult, setVerificationResult] = useState<{
-    valid: boolean
-    nftName?: string
-    collection?: string
-  } | null>(null)
+    valid: boolean;
+    nftName?: string;
+    collection?: string;
+  } | null>(null);
 
   const handleVerify = async () => {
-    setIsVerifying(true)
+    setIsVerifying(true);
     // Simulate NFT verification
     setTimeout(() => {
-      setIsVerifying(false)
+      setIsVerifying(false);
       setVerificationResult({
         valid: true,
         nftName: "Ethereal Dreams #1234",
         collection: "Ethereal Dreams Collection",
-      })
-    }, 2000)
-  }
+      });
+    }, 2000);
+  };
 
   const handleDeposit = async () => {
-    setIsDepositing(true)
+    setIsDepositing(true);
     // Simulate deposit process
     setTimeout(() => {
-      setIsDepositing(false)
-      setDepositComplete(true)
-    }, 3000)
-  }
+      setIsDepositing(false);
+      setDepositComplete(true);
+    }, 3000);
+  };
 
   if (depositComplete) {
     return (
@@ -60,15 +78,21 @@ export default function DepositPage() {
                   <div className="mx-auto w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center mb-4">
                     <CheckCircle2 className="h-8 w-8 text-green-500" />
                   </div>
-                  <h2 className="text-2xl font-bold mb-2">Deposit Successful!</h2>
-                  <p className="text-muted-foreground">Your NFT has been successfully deposited to Opuxvault</p>
+                  <h2 className="text-2xl font-bold mb-2">
+                    Deposit Successful!
+                  </h2>
+                  <p className="text-muted-foreground">
+                    Your NFT has been successfully deposited to Vaultorx
+                  </p>
                 </div>
 
                 <div className="bg-muted rounded-lg p-4 mb-6 text-left">
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">NFT</span>
-                      <span className="font-medium">{verificationResult?.nftName}</span>
+                      <span className="font-medium">
+                        {verificationResult?.nftName}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Network</span>
@@ -82,17 +106,21 @@ export default function DepositPage() {
                 </div>
 
                 <div className="flex gap-3">
-                  <Button variant="outline" className="flex-1 bg-transparent" asChild>
+                  <Button
+                    variant="outline"
+                    className="flex-1 bg-transparent"
+                    asChild
+                  >
                     <Link href="/dashboard">Go to Dashboard</Link>
                   </Button>
                   <Button
                     className="flex-1"
                     onClick={() => {
-                      setDepositComplete(false)
-                      setVerificationResult(null)
-                      setNftContractAddress("")
-                      setTokenId("")
-                      setSelectedNetwork("")
+                      setDepositComplete(false);
+                      setVerificationResult(null);
+                      setNftContractAddress("");
+                      setTokenId("");
+                      setSelectedNetwork("");
                     }}
                   >
                     Deposit Another
@@ -103,7 +131,7 @@ export default function DepositPage() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -122,15 +150,18 @@ export default function DepositPage() {
           <Card>
             <CardHeader>
               <CardTitle>Deposit NFT</CardTitle>
-              <CardDescription>Transfer your NFT from an external wallet to Opuxvault</CardDescription>
+              <CardDescription>
+                Transfer your NFT from an external wallet to Vaultorx
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Network Warning */}
               <Alert>
                 <AlertTriangle className="h-4 w-4" />
                 <AlertDescription>
-                  <strong>Important:</strong> Ensure you select the correct network. Sending NFTs from the wrong network
-                  will result in permanent loss of your asset.
+                  <strong>Important:</strong> Ensure you select the correct
+                  network. Sending NFTs from the wrong network will result in
+                  permanent loss of your asset.
                 </AlertDescription>
               </Alert>
 
@@ -139,7 +170,10 @@ export default function DepositPage() {
                 <Label htmlFor="network">
                   Origin Network <span className="text-destructive">*</span>
                 </Label>
-                <Select value={selectedNetwork} onValueChange={setSelectedNetwork}>
+                <Select
+                  value={selectedNetwork}
+                  onValueChange={setSelectedNetwork}
+                >
                   <SelectTrigger id="network">
                     <SelectValue placeholder="Select the network your NFT is on" />
                   </SelectTrigger>
@@ -159,7 +193,8 @@ export default function DepositPage() {
               {/* Contract Address */}
               <div className="space-y-2">
                 <Label htmlFor="contract">
-                  NFT Contract Address <span className="text-destructive">*</span>
+                  NFT Contract Address{" "}
+                  <span className="text-destructive">*</span>
                 </Label>
                 <Input
                   id="contract"
@@ -187,7 +222,12 @@ export default function DepositPage() {
                 <Button
                   className="w-full"
                   onClick={handleVerify}
-                  disabled={!selectedNetwork || !nftContractAddress || !tokenId || isVerifying}
+                  disabled={
+                    !selectedNetwork ||
+                    !nftContractAddress ||
+                    !tokenId ||
+                    isVerifying
+                  }
                 >
                   {isVerifying ? (
                     <>
@@ -208,9 +248,12 @@ export default function DepositPage() {
                       <CheckCircle2 className="h-4 w-4 text-green-500" />
                       <AlertDescription>
                         <div className="space-y-1">
-                          <p className="font-medium">NFT Verified Successfully</p>
+                          <p className="font-medium">
+                            NFT Verified Successfully
+                          </p>
                           <p className="text-sm">
-                            {verificationResult.nftName} from {verificationResult.collection}
+                            {verificationResult.nftName} from{" "}
+                            {verificationResult.collection}
                           </p>
                         </div>
                       </AlertDescription>
@@ -219,7 +262,8 @@ export default function DepositPage() {
                     <Alert variant="destructive">
                       <AlertTriangle className="h-4 w-4" />
                       <AlertDescription>
-                        Unable to verify NFT. Please check the contract address and token ID.
+                        Unable to verify NFT. Please check the contract address
+                        and token ID.
                       </AlertDescription>
                     </Alert>
                   )}
@@ -235,14 +279,23 @@ export default function DepositPage() {
                             <ol className="list-decimal list-inside space-y-1 text-muted-foreground">
                               <li>Click "Initiate Deposit" below</li>
                               <li>Approve the transaction in your wallet</li>
-                              <li>Wait for blockchain confirmation (1-2 minutes)</li>
-                              <li>Your NFT will appear in your Opuxvault dashboard</li>
+                              <li>
+                                Wait for blockchain confirmation (1-2 minutes)
+                              </li>
+                              <li>
+                                Your NFT will appear in your Vaultorx dashboard
+                              </li>
                             </ol>
                           </div>
                         </div>
                       </div>
 
-                      <Button className="w-full" size="lg" onClick={handleDeposit} disabled={isDepositing}>
+                      <Button
+                        className="w-full"
+                        size="lg"
+                        onClick={handleDeposit}
+                        disabled={isDepositing}
+                      >
                         {isDepositing ? (
                           <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -261,5 +314,5 @@ export default function DepositPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -64,7 +64,7 @@ export function HeroSection() {
             </motion.div>
 
             <motion.h1
-              className="text-6xl md:text-7xl lg:text-8xl font-bold mb-3 leading-tight"
+              className="text-6xl md:text-7xl lg:text-8xl font-bold mb-3 leading-tight text-slate-100"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.8 }}
@@ -187,7 +187,7 @@ export function HeroSection() {
         animate={{ y: [0, 10, 0] }}
         transition={{ duration: 2, repeat: Infinity }}
       >
-        <div className="w-6 h-10 border-2 border-slate-600 rounded-full flex justify-center">
+        <div className="w-6 h-10 border-2 border-slate-100 rounded-full flex justify-center">
           <motion.div
             className="w-1 h-3 bg-slate-400 rounded-full mt-2"
             animate={{ y: [0, 12, 0] }}
