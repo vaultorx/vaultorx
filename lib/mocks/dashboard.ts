@@ -1,0 +1,102 @@
+import { DashboardStats, RecentActivity, QuickAction } from "@/lib/types";
+import { Upload, Download, Plus, Ticket } from "lucide-react";
+
+export const dashboardStats: DashboardStats = {
+  totalCollections: 3,
+  totalNFTs: 86,
+  floorValue: 4.55,
+  totalVolume: 96.8,
+  monthlySales: 45.678,
+  activeExhibitions: 12,
+  totalSales: 2.4,
+  avgSalePrice: 1.2,
+  royaltyEarnings: 0.12,
+  activeListings: 2,
+  activeAuctions: 1,
+  totalBidders: 12,
+  successRate: 67,
+  gasFees: 0.081,
+  pendingTransactions: 1,
+};
+
+export const recentActivities: RecentActivity[] = [
+  {
+    id: "act1",
+    type: "sale",
+    nftName: "Digital Dream #1",
+    price: 1.5,
+    currency: "ETH",
+    from: "0x1234...5678",
+    to: "You",
+    timestamp: new Date("2024-01-20T14:30:00"),
+    status: "completed",
+  },
+  {
+    id: "act2",
+    type: "purchase",
+    nftName: "Cosmic Evolution #23",
+    price: 0.9,
+    currency: "ETH",
+    from: "You",
+    to: "0xabcd...efgh",
+    timestamp: new Date("2024-01-19T11:15:00"),
+    status: "completed",
+  },
+  {
+    id: "act3",
+    type: "listing",
+    nftName: "Urban Legend #7",
+    price: 3.2,
+    currency: "ETH",
+    timestamp: new Date("2024-01-18T09:45:00"),
+    status: "completed",
+  },
+  {
+    id: "act4",
+    type: "bid",
+    nftName: "Digital Dream #5",
+    price: 2.1,
+    currency: "ETH",
+    timestamp: new Date("2024-01-20T16:20:00"),
+    status: "pending",
+  },
+];
+
+export const quickActions: QuickAction[] = [
+  {
+    id: "deposit",
+    title: "Deposit NFT",
+    description: "Add NFTs to your vault",
+    icon: Upload,
+    href: "/dashboard/deposit",
+    color: "blue",
+    enabled: true,
+  },
+  {
+    id: "withdraw",
+    title: "Withdraw NFT",
+    description: "Transfer to external wallet",
+    icon: Download,
+    href: "/dashboard/withdraw",
+    color: "green",
+    enabled: true,
+  },
+  {
+    id: "mint",
+    title: "Mint NFT",
+    description: "Sell your NFTs",
+    icon: Plus,
+    href: "/dashboard/create",
+    color: "purple",
+    enabled: true,
+  },
+  {
+    id: "create-auction",
+    title: "Create Auction",
+    description: "Start a timed auction",
+    icon: Ticket,
+    href: "/auctions?action=create",
+    color: "orange",
+    enabled: true,
+  },
+];
