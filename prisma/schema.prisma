@@ -1,0 +1,299 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String    @id @default(uuid())
+  email            String    @unique
+  username         String?   @unique
+  name             String?
+  password         String?
+  emailVerified    Boolean   @default(false)
+  twoFactorEnabled Boolean   @default(false)
+  kycStatus        KycStatus @default(pending)
+  role             UserRole  @default(USER)
+
+  // Virtual wallet balance (since we're not using real blockchain)
+  walletBalance Float @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  accounts             Account[]
+  sessions             Session[]
+  createdCollections   Collection[]         @relation("CollectionCreator")
+  ownedNFTs            NFTItem[]            @relation("NFTOwner")
+  sentTransactions     Transaction[]        @relation("TransactionSender")
+  receivedTransactions Transaction[]        @relation("TransactionReceiver")
+  buyerEscrows         EscrowTransaction[]  @relation("EscrowBuyer")
+  sellerEscrows        EscrowTransaction[]  @relation("EscrowSeller")
+  withdrawalRequests   WithdrawalRequest[]
+  WhitelistedAddress   WhitelistedAddress[]
+
+  @@map("users")
+}
+
+model Collection {
+  id                String  @id @default(uuid())
+  contractAddress   String  @unique
+  name              String
+  symbol            String?
+  description       String?
+  creatorId         String
+  royaltyPercentage Float   @default(0)
+  floorPrice        Float?
+  totalVolume       Float   @default(0)
+  totalItems        Int     @default(0)
+  listedItems       Int     @default(0)
+  blockchain        String  @default("ethereum")
+  ipfsMetadataUri   String?
+  verified          Boolean @default(false)
+  category          String?
+  image             String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  creator User      @relation("CollectionCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+  nfts    NFTItem[]
+
+  @@map("collections")
+}
+
+model NFTItem {
+  id              String  @id @default(uuid())
+  collectionId    String
+  tokenId         String
+  ownerId         String
+  name            String
+  description     String?
+  image           String
+  ipfsMetadataUri String
+  category        String
+  rarity          Rarity
+  likes           Int     @default(0)
+  views           Int     @default(0)
+  attributes      Json?
+  isListed        Boolean @default(false)
+  listPrice       Float?
+  currency        String  @default("ETH")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  collection         Collection          @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  owner              User                @relation("NFTOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  transactions       Transaction[]
+  escrows            EscrowTransaction[]
+  withdrawalRequests WithdrawalRequest[]
+
+  @@unique([collectionId, tokenId])
+  @@map("nft_items")
+}
+
+model Transaction {
+  id              String            @id @default(uuid())
+  transactionHash String            @unique
+  nftItemId       String
+  fromUserId      String?
+  toUserId        String?
+  transactionType TransactionType
+  price           Float?
+  currency        String?           @default("ETH")
+  gasFee          Float?
+  platformFee     Float?
+  royaltyFee      Float?
+  blockchain      String            @default("ethereum")
+  status          TransactionStatus @default(pending)
+
+  // Additional fields for display
+  nftName String?
+  from    String?
+  to      String?
+
+  createdAt   DateTime  @default(now())
+  confirmedAt DateTime?
+
+  // Relations
+  nftItem  NFTItem @relation(fields: [nftItemId], references: [id], onDelete: Cascade)
+  fromUser User?   @relation("TransactionSender", fields: [fromUserId], references: [id])
+  toUser   User?   @relation("TransactionReceiver", fields: [toUserId], references: [id])
+
+  @@map("transactions")
+}
+
+model EscrowTransaction {
+  id                    String       @id @default(uuid())
+  nftItemId             String
+  buyerId               String
+  sellerId              String
+  escrowContractAddress String?
+  amount                Float
+  currency              String       @default("ETH")
+  status                EscrowStatus @default(locked)
+
+  createdAt  DateTime  @default(now())
+  releasedAt DateTime?
+  expiresAt  DateTime?
+
+  // Relations
+  nftItem NFTItem @relation(fields: [nftItemId], references: [id], onDelete: Cascade)
+  buyer   User    @relation("EscrowBuyer", fields: [buyerId], references: [id], onDelete: Cascade)
+  seller  User    @relation("EscrowSeller", fields: [sellerId], references: [id], onDelete: Cascade)
+
+  @@map("escrow_transactions")
+}
+
+model WithdrawalRequest {
+  id                 String           @id @default(uuid())
+  userId             String
+  nftItemId          String
+  destinationAddress String
+  destinationNetwork String
+  withdrawalFee      Float?
+  verificationCode   String?
+  status             WithdrawalStatus @default(pending)
+
+  createdAt   DateTime  @default(now())
+  completedAt DateTime?
+
+  // Relations
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  nftItem NFTItem @relation(fields: [nftItemId], references: [id], onDelete: Cascade)
+
+  @@map("withdrawal_requests")
+}
+
+model WhitelistedAddress {
+  id        String    @id @default(uuid())
+  userId    String
+  address   String
+  label     String
+  addedAt   DateTime  @default(now())
+  lockUntil DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("whitelisted_addresses")
+}
+
+//////////////////////////////////
+//////////////////////////////////
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expires   DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email, token])
+}
+
+////////////////////
+////////////////////
+////////////////////
+
+enum UserRole {
+  SUPERADMIN
+  ADMIN
+  USER
+}
+
+enum KycStatus {
+  pending
+  approved
+  rejected
+}
+
+enum Rarity {
+  Common
+  Rare
+  Epic
+  Legendary
+}
+
+enum TransactionType {
+  mint
+  sale
+  transfer
+  deposit
+  withdrawal
+  purchase
+}
+
+enum TransactionStatus {
+  pending
+  confirmed
+  failed
+  completed
+}
+
+enum EscrowStatus {
+  locked
+  released
+  refunded
+  disputed
+}
+
+enum WithdrawalStatus {
+  pending
+  verified
+  processing
+  completed
+  failed
+}

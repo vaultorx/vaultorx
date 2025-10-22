@@ -3,7 +3,8 @@ import { LucideIcon } from "lucide-react";
 // Base types
 export interface User {
   id: string;
-  walletAddress: string;
+  username?: string;
+  // walletAddress: string;
   email?: string;
   emailVerified: boolean;
   twoFactorEnabled: boolean;
@@ -33,6 +34,13 @@ export interface Collection {
   image?: string;
 }
 
+export interface NFTCategory {
+  id: string;
+  name: string;
+  icon: LucideIcon | string;
+  color?: string;
+  nfts: NFTItem[];
+}
 export interface NFTItem {
   id: string;
   collectionId: string;

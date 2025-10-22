@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -30,6 +29,8 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
+// import { signOut } from "@/auth";
+import { signOut } from "next-auth/react";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -50,6 +51,7 @@ const navigation = [
 function AppSidebar() {
   const pathname = usePathname();
   const { state } = useSidebar();
+  const handleSignOut = async () => await signOut();
 
   return (
     <Sidebar>
@@ -85,11 +87,9 @@ function AppSidebar() {
       <SidebarFooter className="p-4 border-t bg-gray-100">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <Link href="/login" className="text-sidebar-foreground">
-                <LogOut />
-                <span>Sign Out</span>
-              </Link>
+            <SidebarMenuButton onClick={handleSignOut} className="cursor-pointer">
+              <LogOut />
+              <span>Sign Out</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

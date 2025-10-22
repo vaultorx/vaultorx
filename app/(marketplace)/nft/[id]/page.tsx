@@ -25,6 +25,7 @@ import {
   Shield,
   TrendingUp,
 } from "lucide-react";
+import { nftArray } from "@/lib/mocks";
 
 // Enhanced mock data
 const mockNFT = {
@@ -134,27 +135,6 @@ const mockTransactions = [
     createdAt: new Date("2025-08-01"),
   },
 ];
-
-const mockRelatedNFTs = Array.from({ length: 8 }, (_, i) => ({
-  id: `nft-related-${i + 1}`,
-  collectionId: "collection-1",
-  tokenId: `${i + 100}`,
-  ownerId: `user-${i + 1}`,
-  name: `Ethereal Dreams #${i + 100}`,
-  description: "Another piece from the collection",
-  image: `/placeholder.svg?height=400&width=400`,
-  ipfsMetadataUri: `ipfs://metadata-${i + 1}`,
-  isListed: true,
-  listPrice: Number((Math.random() * 5 + 1).toFixed(2)),
-  currency: "WETH",
-  createdAt: new Date(),
-  updatedAt: new Date(),
-  category: "art",
-  rarity: ["Common", "Rare", "Epic", "Legendary"][i % 4],
-  likes: Math.floor(Math.random() * 1000),
-  views: Math.floor(Math.random() * 5000),
-  collection: mockNFT.collection,
-}));
 
 export default function NFTDetailPage() {
   const [activeTab, setActiveTab] = useState("description");
@@ -635,7 +615,6 @@ export default function NFTDetailPage() {
                   </div>
                 </div>
               )}
-
             </motion.div>
           </AnimatePresence>
         </motion.div>
@@ -667,7 +646,7 @@ export default function NFTDetailPage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {mockRelatedNFTs.map((nft, index) => (
+            {nftArray.map((nft, index) => (
               <CompactNFTCard key={nft.id} nft={nft} index={index} />
             ))}
           </div>

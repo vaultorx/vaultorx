@@ -48,11 +48,6 @@ export function Header() {
             <Link href="/" className="relative flex items-center gap-3">
               <span className="text-xl font-bold bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
                 Vaultorx
-                <motion.div
-                  className="absolute -top-1 -right-2 h-1 w-1 bg-green-500 rounded-full border-2 border-slate-950"
-                  animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                />
               </span>
             </Link>
           </motion.div>
@@ -100,24 +95,31 @@ export function Header() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white gap-2"
-                >
-                  <LogIn className="h-4 w-4" />
-                  Login
-                </Button>
+                <Link href="/login">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white gap-2"
+                  >
+                    <LogIn className="h-4 w-4" />
+                    Login
+                  </Button>
+                </Link>
               </motion.div>
 
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <Button size="sm" className="bg-blue-500 gap-2">
-                  <UserPlus className="h-4 w-4" />
-                  Sign Up
-                </Button>
+                <Link href="/signup">
+                  <Button
+                    size="sm"
+                    className="bg-blue-500 gap-2 hover:bg-blue-600"
+                  >
+                    <UserPlus className="h-4 w-4" />
+                    Sign Up
+                  </Button>
+                </Link>
               </motion.div>
             </div>
           </div>

@@ -17,8 +17,18 @@ export function HeroSection() {
   const constraintsRef = useRef(null);
 
   const nftCards = [
-    { id: 1, image: "/placeholder.svg", name: "Ethereal #4234", price: "1.5 ETH" },
-    { id: 2, image: "/placeholder.svg", name: "Digital Dreams", price: "2.1 ETH" },
+    {
+      id: 1,
+      image: "/placeholder.svg",
+      name: "Ethereal #4234",
+      price: "1.5 ETH",
+    },
+    {
+      id: 2,
+      image: "/placeholder.svg",
+      name: "Digital Dreams",
+      price: "2.1 ETH",
+    },
     { id: 3, image: "/placeholder.svg", name: "Cyber Void", price: "3.8 ETH" },
   ];
 
@@ -64,17 +74,12 @@ export function HeroSection() {
             </motion.div>
 
             <motion.h1
-              className="text-6xl md:text-7xl lg:text-8xl font-bold mb-3 leading-tight text-slate-100"
+              className="text-5xl md:text-6xl lg:text-7xl font-bold mb-3 leading-tight text-slate-100"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.8 }}
             >
-              Discover
-              <br />
-              <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-cyan-400 bg-clip-text text-transparent">
-                Digital Art
-              </span>
-              <br />& NFTs
+              Discover Digital Art & NFTs
             </motion.h1>
 
             <motion.p
@@ -93,18 +98,20 @@ export function HeroSection() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
             >
-              <Button
-                size="lg"
-                className="h-14 px-8 text-lg font-semibold bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 gap-3"
-              >
-                Explore Marketplace
-                <motion.div
-                  animate={{ x: [0, 5, 0] }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
+              <Link href="/marketplace">
+                <Button
+                  size="lg"
+                  className="h-14 px-8 text-lg font-semibold bg-blue-500 gap-3"
                 >
-                  <ArrowRight className="h-5 w-5" />
-                </motion.div>
-              </Button>
+                  Explore Marketplace
+                  <motion.div
+                    animate={{ x: [0, 5, 0] }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                  >
+                    <ArrowRight className="h-5 w-5" />
+                  </motion.div>
+                </Button>
+              </Link>
             </motion.div>
 
             {/* Stats */}
