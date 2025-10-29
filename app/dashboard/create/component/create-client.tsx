@@ -87,26 +87,6 @@ const MINT_STEPS = [
   { id: 4, title: "Review", description: "Confirm & mint" },
 ];
 
-// Mock collections data - in production, this would come from an API
-const MOCK_COLLECTIONS = [
-  { id: "1", name: "Digital Dreams", verified: true },
-  { id: "2", name: "Cosmic Evolution", verified: true },
-  { id: "3", name: "Urban Legends", verified: false },
-];
-
-const CATEGORIES = [
-  "art",
-  "gaming",
-  "photography",
-  "3d",
-  "animated",
-  "collectibles",
-  "music",
-  "pfps",
-  "sports",
-  "fashion",
-];
-
 export default function CreateClient() {
   const router = useRouter();
   const { data: session } = useSession();
@@ -180,72 +160,92 @@ export default function CreateClient() {
     const isValidStep = await trigger(fieldsToValidate);
     if (isValidStep && currentStep < 4) {
       setCurrentStep(currentStep + 1);
+      setMintError(null); // Clear errors when progressing
     }
   };
 
   const handleBack = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
+      setMintError(null); // Clear errors when going back
     }
   };
 
-  const onSubmit = async (data: MintFormData) => {
-    if (!session?.user?.email) {
-      setMintError("You must be logged in to mint an NFT");
-      return;
-    }
+ const onSubmit = async (data: MintFormData) => {
+   if (!session?.user?.email) {
+     setMintError("You must be logged in to mint an NFT");
+     return;
+   }
 
-    setIsProcessing(true);
-    setMintError(null);
+   // Validate terms acceptance
+   if (!data.termsAccepted) {
+     setMintError("You must accept the terms and conditions");
+     return;
+   }
 
-    try {
-      const response = await nftService.createNFT({
-        name: data.name,
-        description: data.description || "",
-        collectionId: data.collectionId,
-        category: data.category,
-        rarity: data.rarity,
-        attributes:
-          data.attributes.length > 0
-            ? data.attributes.reduce((acc, attr) => {
-                acc[attr.trait_type] = attr.value;
-                return acc;
-              }, {} as Record<string, any>)
-            : undefined,
-        image: data.file,
-      });
+   setIsProcessing(true);
+   setMintError(null);
 
-      if (response.success) {
-        // If the NFT should be listed for sale
-        if (data.saleType !== "not-for-sale" && data.price) {
-          await nftService.listNFT(
-            response.data.id,
-            parseFloat(data.price),
-            data.currency
-          );
-        }
+   try {
+     console.log("Starting NFT minting process...", {
+       name: data.name,
+       collectionId: data.collectionId,
+       hasFile: !!data.file,
+     });
 
-        // Redirect to the newly created NFT
-        router.push(`/nft/${response.data.id}`);
-      } else {
-        setMintError(response.message || "Failed to mint NFT");
-      }
-    } catch (error) {
-      console.error("Minting failed:", error);
-      setMintError("An error occurred while minting your NFT");
-    } finally {
-      setIsProcessing(false);
-    }
-  };
+     const response = await nftService.createNFT({
+       name: data.name,
+       description: data.description || "",
+       collectionId: data.collectionId,
+       category: data.category,
+       rarity: data.rarity,
+       attributes:
+         data.attributes.length > 0
+           ? data.attributes.reduce((acc, attr) => {
+               acc[attr.trait_type] = attr.value;
+               return acc;
+             }, {} as Record<string, any>)
+           : undefined,
+       image: data.file,
+     });
+
+     console.log("NFT creation response:", response);
+
+     if (response.success) {
+       console.log("NFT created successfully:", response.data.id);
+
+       // If the NFT should be listed for sale
+       if (data.saleType !== "not-for-sale" && data.price) {
+         console.log("Listing NFT for sale...");
+         await nftService.listNFT(
+           response.data.id,
+           parseFloat(data.price),
+           data.currency
+         );
+       }
+
+       // Redirect to the newly created NFT
+       console.log("Redirecting to NFT page...");
+       router.push(`/nft/${response.data.id}`);
+     } else {
+       console.error("NFT creation failed:", response.message);
+       setMintError(response.message || "Failed to mint NFT");
+     }
+   } catch (error) {
+     console.error("Minting failed:", error);
+     setMintError("An error occurred while minting your NFT");
+   } finally {
+     setIsProcessing(false);
+   }
+ };
+
 
   const canProceed = () => {
     switch (currentStep) {
       case 1:
         return !!watchedValues.file && !errors.file;
       case 2:
-        return (
-          !!watchedValues.name && !errors.name && !!watchedValues.collectionId
-        );
+        return !!watchedValues.name && !errors.name;
       case 3:
         if (saleType === "not-for-sale") return true;
         return (
@@ -260,11 +260,154 @@ export default function CreateClient() {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-linear-to-br from-slate-950 via-blue-950/20 to-purple-950/20">
-      <Header />
+  const getStepContent = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <MintUploadStep
+              onFileSelect={handleFileSelect}
+              selectedFile={(watchedValues.file as File) ?? null}
+            />
+            {errors.file && (
+              <p className="text-red-400 text-sm mt-2">{errors.file.message}</p>
+            )}
+          </motion.div>
+        );
 
-      <div className="container mx-auto py-8 px-4 pt-24">
+      case 2:
+        return (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <MintDetailsStep
+              name={watchedValues.name ?? ""}
+              description={watchedValues.description ?? ""}
+              attributes={watchedValues.attributes ?? []}
+              collectionId={watchedValues.collectionId ?? ""}
+              category={watchedValues.category ?? "art"}
+              rarity={watchedValues.rarity ?? "Common"}
+              onNameChange={(value) =>
+                setValue("name", value, { shouldValidate: true })
+              }
+              onDescriptionChange={(value) =>
+                setValue("description", value, {
+                  shouldValidate: true,
+                })
+              }
+              onAttributesChange={(value) =>
+                setValue("attributes", value, {
+                  shouldValidate: true,
+                })
+              }
+              onCollectionChange={(value) =>
+                setValue("collectionId", value, {
+                  shouldValidate: true,
+                })
+              }
+              onCategoryChange={(value) =>
+                setValue("category", value, { shouldValidate: true })
+              }
+              onRarityChange={(value) =>
+                setValue(
+                  "rarity",
+                  value as "Common" | "Rare" | "Epic" | "Legendary",
+                  { shouldValidate: true }
+                )
+              }
+            />
+            {(errors.name ||
+              errors.collectionId ||
+              errors.category ||
+              errors.rarity) && (
+              <p className="text-red-400 text-sm mt-2">
+                Please fill in all required fields
+              </p>
+            )}
+          </motion.div>
+        );
+
+      case 3:
+        return (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <MintPricingStep
+              saleType={watchedValues.saleType ?? "fixed"}
+              price={watchedValues.price ?? ""}
+              currency={watchedValues.currency ?? "ETH"}
+              royalty={watchedValues.royalty ?? 5}
+              onSaleTypeChange={(value) =>
+                setValue("saleType", value, { shouldValidate: true })
+              }
+              onPriceChange={(value) =>
+                setValue("price", value, { shouldValidate: true })
+              }
+              onCurrencyChange={(value) =>
+                setValue("currency", value as "ETH" | "WETH" | "USDC", {
+                  shouldValidate: true,
+                })
+              }
+              onRoyaltyChange={(value) =>
+                setValue("royalty", value, { shouldValidate: true })
+              }
+            />
+            {errors.price && (
+              <p className="text-red-400 text-sm mt-2">
+                {errors.price.message}
+              </p>
+            )}
+          </motion.div>
+        );
+
+      case 4:
+        return (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <MintReviewStep
+              file={(watchedValues.file as File) ?? null}
+              preview={preview}
+              name={watchedValues.name ?? ""}
+              description={watchedValues.description ?? ""}
+              attributes={watchedValues.attributes ?? []}
+              saleType={watchedValues.saleType ?? "fixed"}
+              price={watchedValues.price ?? ""}
+              currency={watchedValues.currency ?? "ETH"}
+              royalty={watchedValues.royalty ?? 5}
+              isProcessing={isProcessing}
+              gasFee="0.0045"
+              onMint={handleSubmit(onSubmit)} // This should just be handleSubmit(onSubmit)
+              termsAccepted={watchedValues.termsAccepted ?? false}
+              onTermsAcceptedChange={(value) =>
+                setValue("termsAccepted", value, { shouldValidate: true })
+              }
+            />
+            {errors.termsAccepted && (
+              <p className="text-red-400 text-sm mt-2">
+                {errors.termsAccepted.message}
+              </p>
+            )}
+          </motion.div>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="min-h-screen">
+      <div className="container mx-auto py-8 px-4">
         <motion.div
           className="max-w-4xl mx-auto"
           initial={{ opacity: 0, y: 20 }}
@@ -279,12 +422,7 @@ export default function CreateClient() {
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 200, damping: 15 }}
             >
-              <div className="h-12 w-12 rounded-xl bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                <Rocket className="h-6 w-6 text-white" />
-              </div>
-              <h1 className="text-4xl md:text-5xl font-bold bg-linear-to-r from-white to-slate-300 bg-clip-text text-transparent">
-                Create NFT
-              </h1>
+              <h1 className="text-4xl md:text-5xl font-bold">Create NFT</h1>
             </motion.div>
             <p className="text-lg text-slate-400 max-w-2xl mx-auto">
               Transform your digital creation into a unique, verifiable asset on
@@ -293,15 +431,18 @@ export default function CreateClient() {
           </div>
 
           {/* Error Display */}
-          {mintError && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-lg"
-            >
-              <p className="text-red-400 text-sm">{mintError}</p>
-            </motion.div>
-          )}
+          <AnimatePresence>
+            {mintError && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-lg"
+              >
+                <p className="text-red-400 text-sm">{mintError}</p>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Enhanced Steps Indicator */}
           <div className="mb-12">
@@ -317,156 +458,10 @@ export default function CreateClient() {
             transition={{ duration: 0.3 }}
             className="mb-8"
           >
-            <div className="bg-slate-900/40 backdrop-blur-xl rounded-2xl border border-slate-700/50 p-6 md:p-8 shadow-2xl">
+            <div className="backdrop-blur-xl rounded-2xl border border-slate-700/50 p-6 md:p-8 shadow-2xl">
               <form onSubmit={handleSubmit(onSubmit)}>
                 <AnimatePresence mode="wait">
-                  {currentStep === 1 && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                    >
-                      <MintUploadStep
-                        onFileSelect={handleFileSelect}
-                        selectedFile={(watchedValues.file as File) ?? null}
-                        // preview={preview}
-                      />
-                      {errors.file && (
-                        <p className="text-red-400 text-sm mt-2">
-                          {errors.file.message}
-                        </p>
-                      )}
-                    </motion.div>
-                  )}
-
-                  {currentStep === 2 && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                    >
-                      <MintDetailsStep
-                        name={watchedValues.name ?? ""}
-                        description={watchedValues.description ?? ""}
-                        attributes={watchedValues.attributes ?? []}
-                        // collectionId={watchedValues.collectionId ?? ""}
-                        // category={watchedValues.category ?? "art"}
-                        // rarity={watchedValues.rarity ?? "Common"}
-                        // collections={MOCK_COLLECTIONS}
-                        // categories={CATEGORIES}
-                        onNameChange={(value) =>
-                          setValue("name", value, { shouldValidate: true })
-                        }
-                        onDescriptionChange={(value) =>
-                          setValue("description", value, {
-                            shouldValidate: true,
-                          })
-                        }
-                        onAttributesChange={(value) =>
-                          setValue("attributes", value, {
-                            shouldValidate: true,
-                          })
-                        }
-                        // onCollectionChange={(value: any) =>
-                        //   setValue("collectionId", value, {
-                        //     shouldValidate: true,
-                        //   })
-                        // }
-                        // onCategoryChange={(value: any) =>
-                        //   setValue("category", value, { shouldValidate: true })
-                        // }
-                        // onRarityChange={(value: any) =>
-                        //   setValue(
-                        //     "rarity",
-                        //     value as "Common" | "Rare" | "Epic" | "Legendary",
-                        //     { shouldValidate: true }
-                        //   )
-                        // }
-                      />
-                      {errors.name && (
-                        <p className="text-red-400 text-sm mt-2">
-                          {errors.name.message}
-                        </p>
-                      )}
-                    </motion.div>
-                  )}
-
-                  {currentStep === 3 && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                    >
-                      <MintPricingStep
-                        saleType={watchedValues.saleType ?? "fixed"}
-                        price={watchedValues.price ?? ""}
-                        currency={watchedValues.currency ?? "ETH"}
-                        royalty={watchedValues.royalty ?? 5}
-                        onSaleTypeChange={(value) =>
-                          setValue("saleType", value, { shouldValidate: true })
-                        }
-                        onPriceChange={(value) =>
-                          setValue("price", value, { shouldValidate: true })
-                        }
-                        onCurrencyChange={(value) =>
-                          setValue(
-                            "currency",
-                            value as "ETH" | "WETH" | "USDC",
-                            { shouldValidate: true }
-                          )
-                        }
-                        onRoyaltyChange={(value) =>
-                          setValue("royalty", value, { shouldValidate: true })
-                        }
-                      />
-                      {errors.price && (
-                        <p className="text-red-400 text-sm mt-2">
-                          {errors.price.message}
-                        </p>
-                      )}
-                    </motion.div>
-                  )}
-
-                  {currentStep === 4 && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                    >
-                      <MintReviewStep
-                        file={(watchedValues.file as File) ?? null}
-                        preview={preview}
-                        name={watchedValues.name ?? ""}
-                        description={watchedValues.description ?? ""}
-                        attributes={watchedValues.attributes ?? []}
-                        // collection={
-                        //   MOCK_COLLECTIONS.find(
-                        //     (c) => c.id === watchedValues.collectionId
-                        //   )?.name || ""
-                        // }
-                        // category={watchedValues.category ?? ""}
-                        // rarity={watchedValues.rarity ?? "Common"}
-                        saleType={watchedValues.saleType ?? "fixed"}
-                        price={watchedValues.price ?? ""}
-                        currency={watchedValues.currency ?? "ETH"}
-                        royalty={watchedValues.royalty ?? 5}
-                        isProcessing={isProcessing}
-                        gasFee="0.0045"
-                        onMint={handleSubmit(onSubmit)}
-                        // termsAccepted={watchedValues.termsAccepted ?? false}
-                        // onTermsAcceptedChange={(value: any) =>
-                        //   setValue("termsAccepted", value, {
-                        //     shouldValidate: true,
-                        //   })
-                        // }
-                      />
-                      {errors.termsAccepted && (
-                        <p className="text-red-400 text-sm mt-2">
-                          {errors.termsAccepted.message}
-                        </p>
-                      )}
-                    </motion.div>
-                  )}
+                  {getStepContent()}
                 </AnimatePresence>
               </form>
             </div>
@@ -502,7 +497,7 @@ export default function CreateClient() {
                 <Button
                   onClick={handleNext}
                   disabled={!canProceed()}
-                  className="gap-2 bg-linear-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 px-8"
+                  className="gap-2 px-8"
                 >
                   {currentStep === 3 ? "Review" : "Next"}
                   <ArrowRight className="h-4 w-4" />
@@ -510,33 +505,7 @@ export default function CreateClient() {
               </motion.div>
             </motion.div>
           )}
-
-          {/* Enhanced Progress Info */}
-          <motion.div
-            className="mt-8 text-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-          >
-            <div className="inline-flex items-center gap-4 text-sm text-slate-500 bg-slate-800/30 rounded-full px-4 py-2 border border-slate-700/50">
-              <div className="flex items-center gap-2">
-                <Shield className="h-4 w-4 text-green-400" />
-                <span>Secure Minting</span>
-              </div>
-              <div className="h-1 w-1 bg-slate-600 rounded-full" />
-              <div className="flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-blue-400" />
-                <span>Gas Optimized</span>
-              </div>
-            </div>
-          </motion.div>
         </motion.div>
-      </div>
-
-      {/* Background Elements */}
-      <div className="fixed inset-0 -z-10 overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
       </div>
     </div>
   );

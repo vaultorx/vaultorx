@@ -8,7 +8,6 @@
     "start": "next start",
     "lint": "eslint .",
     "postinstall": "pnpm db:generate && pnpm db:migrate",
-    "prestart": "pnpm db:seed",
     "db:seed": "tsx prisma/seed.ts",
     "db:seed:superadmin": "tsx prisma/seed-cli.ts",
     "db:reset": "prisma migrate reset && npm run db:seed",

@@ -1,3 +1,4 @@
+// lib/api-client.ts
 import { ApiResponse } from "@/lib/types";
 
 class ApiClient {
@@ -99,7 +100,7 @@ class ApiClient {
     });
   }
 
-  // Form data upload (for images/files)
+  // Form data upload (for images/files) - POST
   async postFormData<T>(
     endpoint: string,
     formData: FormData,
@@ -107,6 +108,22 @@ class ApiClient {
   ): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
       method: "POST",
+      headers: {
+        // Let browser set Content-Type with boundary for FormData
+      },
+      body: formData,
+      ...options,
+    });
+  }
+
+  // Form data upload (for images/files) - PUT
+  async putFormData<T>(
+    endpoint: string,
+    formData: FormData,
+    options?: RequestInit
+  ): Promise<ApiResponse<T>> {
+    return this.request<T>(endpoint, {
+      method: "PUT",
       headers: {
         // Let browser set Content-Type with boundary for FormData
       },

@@ -29,9 +29,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useCollections, useCollectionStats } from "@/hooks/use-collections";
 import { useNFTs } from "@/hooks/use-nfts";
 import Link from "next/link";
+import {
+  useUserCollections,
+  useUserCollectionsStats,
+} from "@/hooks/use-user-collections";
+import { CreateCollectionDialog } from "@/components/collection-create-dialog";
+import { CollectionActions } from "@/components/collection-actions";
 
 export default function CollectionPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -42,13 +47,10 @@ export default function CollectionPage() {
     collections,
     loading: collectionsLoading,
     error: collectionsError,
-  } = useCollections({
-    search: searchQuery,
-    category: selectedCategory === "all" ? undefined : selectedCategory,
-  });
+  } = useUserCollections();
 
   const { stats: collectionStats, loading: statsLoading } =
-    useCollectionStats();
+    useUserCollectionsStats();
   const { nfts: userNFTs, loading: nftsLoading } = useNFTs({
     search: searchQuery,
     limit: 100,
@@ -223,11 +225,7 @@ export default function CollectionPage() {
                   <List className="h-4 w-4" />
                 </Button>
               </div>
-
-              <Button className="gap-2">
-                <Plus className="h-4 w-4" />
-                Add Collection
-              </Button>
+              <CreateCollectionDialog />
             </div>
           </div>
 
@@ -256,31 +254,29 @@ export default function CollectionPage() {
             {!collectionsLoading && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {collections.map((collection) => (
-                  <Link href={`/collections/${collection.id}`}>
-                    <Card
-                      key={collection.id}
-                      className="group cursor-pointer hover:shadow-lg transition-shadow"
-                    >
-                      <CardHeader className="pb-4">
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <CardTitle className="flex items-center gap-2">
-                              {collection.name}
-                              {collection.verified && (
-                                <Badge variant="secondary" className="text-xs">
-                                  Verified
-                                </Badge>
-                              )}
-                            </CardTitle>
-                            <CardDescription className="mt-2 line-clamp-2">
-                              {collection.description}
-                            </CardDescription>
-                          </div>
-                          <Button variant="ghost" size="sm">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
+                  <Card
+                    key={collection.id}
+                    className="group cursor-pointer hover:shadow-lg transition-shadow"
+                  >
+                    <CardHeader className="pb-4">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <CardTitle className="flex items-center gap-2">
+                            {collection.name}
+                            {collection.verified && (
+                              <Badge variant="secondary" className="text-xs">
+                                Verified
+                              </Badge>
+                            )}
+                          </CardTitle>
+                          <CardDescription className="mt-2 line-clamp-2">
+                            {collection.description}
+                          </CardDescription>
                         </div>
-                      </CardHeader>
+                        <CollectionActions collection={collection} />
+                      </div>
+                    </CardHeader>
+                    <Link href={`/collections/${collection.id}`}>
                       <CardContent className="space-y-4">
                         <div className="aspect-square bg-muted rounded-lg flex items-center justify-center">
                           {collection.image ? (
@@ -314,8 +310,8 @@ export default function CollectionPage() {
                           </div>
                           <div>
                             <p className="text-muted-foreground">Blockchain</p>
-                            <p className="font-semibold">
-                              {collection.blockchain}
+                            <p className="font-semibold capitalize">
+                              {collection.blockchain || "ethereum"}
                             </p>
                           </div>
                           <div>
@@ -326,8 +322,8 @@ export default function CollectionPage() {
                           </div>
                         </div>
                       </CardContent>
-                    </Card>
-                  </Link>
+                    </Link>
+                  </Card>
                 ))}
               </div>
             )}
@@ -345,10 +341,14 @@ export default function CollectionPage() {
                         ? "Try adjusting your search terms"
                         : "You haven't created any collections yet"}
                     </p>
-                    <Button className="gap-2">
-                      <Plus className="h-4 w-4" />
-                      Create Your First Collection
-                    </Button>
+                    <CreateCollectionDialog
+                      trigger={
+                        <Button className="gap-2">
+                          <Plus className="h-4 w-4" />
+                          Create Your First Collection
+                        </Button>
+                      }
+                    />
                   </div>
                 </CardContent>
               </Card>

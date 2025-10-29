@@ -27,9 +27,9 @@ export const SUPPORTED_BLOCKCHAINS = [
 
 export const SUPPORTED_CURRENCIES = [
   { id: "ETH", name: "Ethereum", symbol: "ETH" },
-  { id: "WETH", name: "Wrapped Ethereum", symbol: "WETH" },
-  { id: "USDC", name: "USD Coin", symbol: "USDC" },
-  { id: "USDT", name: "Tether", symbol: "USDT" },
+  // { id: "WETH", name: "Wrapped Ethereum", symbol: "WETH" },
+  // { id: "USDC", name: "USD Coin", symbol: "USDC" },
+  // { id: "USDT", name: "Tether", symbol: "USDT" },
 ]
 
 export const PLATFORM_FEE_BPS = 250 // 2.5%

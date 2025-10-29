@@ -1,3 +1,4 @@
+// services/nft-service.ts
 import { apiClient } from "@/lib/api-client";
 import { NFTItem, Collection, ApiResponse, FilterOptions } from "@/lib/types";
 
@@ -30,22 +31,40 @@ export class NFTService {
     return apiClient.get<NFTItem>(`/nfts/${id}`);
   }
 
-  // Create new NFT
+  // Create new NFT with better error handling
   async createNFT(data: CreateNFTData): Promise<ApiResponse<NFTItem>> {
-    const formData = new FormData();
-    formData.append("name", data.name);
-    formData.append("description", data.description);
-    formData.append("collectionId", data.collectionId);
-    formData.append("category", data.category);
-    formData.append("rarity", data.rarity);
+    try {
+      console.log("Creating NFT with data:", {
+        name: data.name,
+        collectionId: data.collectionId,
+        hasImage: !!data.image,
+        imageSize: data.image?.size,
+      });
 
-    if (data.attributes) {
-      formData.append("attributes", JSON.stringify(data.attributes));
+      const formData = new FormData();
+      formData.append("name", data.name);
+      formData.append("description", data.description || "");
+      formData.append("collectionId", data.collectionId);
+      formData.append("category", data.category);
+      formData.append("rarity", data.rarity);
+
+      if (data.attributes && Object.keys(data.attributes).length > 0) {
+        formData.append("attributes", JSON.stringify(data.attributes));
+      }
+
+      if (!data.image) {
+        throw new Error("Image file is required");
+      }
+
+      formData.append("image", data.image);
+
+      const response = await apiClient.postFormData<NFTItem>("/nfts", formData);
+      console.log("NFT creation API response:", response);
+      return response;
+    } catch (error) {
+      console.error("Error in NFTService.createNFT:", error);
+      throw error;
     }
-
-    formData.append("image", data.image);
-
-    return apiClient.postFormData<NFTItem>("/nfts", formData);
   }
 
   // Update NFT

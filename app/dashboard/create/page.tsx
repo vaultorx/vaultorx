@@ -101,9 +101,7 @@ export default function CreatePage() {
 
   return (
     <div className="min-h-screen">
-      <Header />
       <CreateClient />
-      <DashboardFooter />
     </div>
   );
 }
