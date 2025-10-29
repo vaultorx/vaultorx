@@ -2,14 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
 interface RouteParams {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     // Validate UUID format
     if (
@@ -109,6 +109,11 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         { status: 404 }
       );
     }
+
+    await prisma.nFTItem.update({
+      where: { id: nft.id },
+      data: { views: { increment: 1 } },
+    });
 
     // Calculate additional stats
     const totalVolume = await prisma.transaction.aggregate({

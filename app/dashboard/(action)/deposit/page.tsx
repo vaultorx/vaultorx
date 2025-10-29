@@ -33,6 +33,7 @@ import {
   Copy,
 } from "lucide-react";
 import Link from "next/link";
+import { toast } from "sonner";
 // import toast from "sooner"
 
 interface DepositRequest {
@@ -78,11 +79,7 @@ export default function DepositPage() {
 
   const handleSubmitDeposit = async () => {
     if (!amount || parseFloat(amount) <= 0 || !transactionHash) {
-      // toast({
-      //   title: "Error",
-      //   description: "Please fill all required fields",
-      //   variant: "destructive",
-      // });
+      toast("Please fill all required fields");
       return;
     }
 
@@ -105,23 +102,16 @@ export default function DepositPage() {
       if (data.success) {
         setCurrentDeposit(data.data.depositRequest);
         setDepositComplete(true);
-        // toast({
-        //   title: "Deposit Submitted",
-        //   description: "Your deposit is pending admin approval",
-        // });
+        toast("Deposit Submitted", {
+          description: "Your deposit is pending admin approval",
+        });
       } else {
-        // toast({
-        //   title: "Error",
-        //   description: data.error || "Failed to submit deposit",
-        //   variant: "destructive",
-        // });
+        toast("Error", {
+          description: data.error || "Failed to submit deposit",
+        });
       }
     } catch (error) {
-      // toast({
-      //   title: "Error",
-      //   description: "Failed to submit deposit request",
-      //   variant: "destructive",
-      // });
+      toast("Error", { description: "Failed to submit deposit request" });
     } finally {
       setIsSubmitting(false);
     }
@@ -129,10 +119,7 @@ export default function DepositPage() {
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    // toast({
-    //   title: "Copied!",
-    //   description: "Wallet address copied to clipboard",
-    // });
+    toast("Copied!", { description: "Wallet address copied to clipboard" });
   };
 
   if (depositComplete && currentDeposit) {
@@ -150,7 +137,7 @@ export default function DepositPage() {
                     Deposit Request Submitted!
                   </h2>
                   <p className="text-muted-foreground">
-                    Your deposit is pending admin approval
+                    Your deposit is pending approval
                   </p>
                 </div>
 
@@ -303,6 +290,7 @@ export default function DepositPage() {
                     step="0.000001"
                     placeholder="0.00"
                     value={amount}
+                    min="0.000001"
                     onChange={(e) => setAmount(e.target.value)}
                   />
                   <Select value={currency} onValueChange={setCurrency}>
@@ -311,8 +299,8 @@ export default function DepositPage() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="ETH">ETH</SelectItem>
-                      <SelectItem value="USDC">USDC</SelectItem>
-                      <SelectItem value="USDT">USDT</SelectItem>
+                      {/* <SelectItem value="USDC">USDC</SelectItem>
+                      <SelectItem value="USDT">USDT</SelectItem> */}
                     </SelectContent>
                   </Select>
                 </div>

@@ -12,6 +12,7 @@ import {
   FileText,
   Shield,
   LogOut,
+  Settings,
 } from "lucide-react";
 
 import {
@@ -39,6 +40,7 @@ const navigation = [
   { name: "Sales", href: "/dashboard/sales", icon: TrendingUp },
   { name: "Exhibitions", href: "/dashboard/exhibitions", icon: Image },
   { name: "Auctions", href: "/dashboard/auctions", icon: Gavel },
+  { name: "Settings", href: "/dashboard/settings", icon: Settings }, // Add this line
   { name: "Privacy Policy", href: "/dashboard/privacy-policy", icon: Shield },
   {
     name: "Terms Of Service",

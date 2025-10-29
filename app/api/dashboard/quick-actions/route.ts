@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Upload, Download, Plus, Ticket } from "lucide-react";
 
 export async function GET() {
   try {
     const quickActions = [
       {
         id: "deposit",
-        title: "Deposit NFT",
-        description: "Add NFTs to your vault",
+        title: "Deposit",
+        description: "Add funds to your vault",
         icon: "Upload",
         href: "/dashboard/deposit",
         color: "blue",
@@ -15,7 +14,7 @@ export async function GET() {
       },
       {
         id: "withdraw",
-        title: "Withdraw NFT",
+        title: "Withdraw",
         description: "Transfer to external wallet",
         icon: "Download",
         href: "/dashboard/withdraw",

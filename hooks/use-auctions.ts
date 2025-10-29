@@ -66,13 +66,13 @@ export function useAuctionStats() {
         const auctions = response.data;
         const totalAuctions = auctions.length;
         const totalVolume = auctions.reduce(
-          (sum, auction) => sum + (auction.finalBid || auction.currentBid || 0),
+          (sum, auction) => sum + (auction.reservePrice || auction.startingPrice || 0),
           0
         );
         const activeBidders = new Set(auctions.flatMap((a) => a.bidders || []))
           .size;
         const successRate =
-          (auctions.filter((a) => a.status === "ended" && a.finalBid).length /
+          (auctions.filter((a) => a.status === "ended" && a.reservePrice).length /
             Math.max(auctions.length, 1)) *
           100;
 

@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Heart, Clock, Eye, TrendingUp, ShoppingCart } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { NFTItem } from "@/lib/types";
 import { getCategoryById } from "@/lib/mocks";

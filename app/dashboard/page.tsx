@@ -4,14 +4,6 @@ import { DashboardStats } from "@/components/dashboard-stats"
 import { DashboardQuickActions } from "@/components/dashboard-quick-actions"
 import { DashboardRecentActivity } from "@/components/dashboard-recent-activity"
 import { DashboardNFTGrid } from "@/components/dashboard-nft-grid"
-import type { NFTItem } from "@/lib/types"
-
-import {
-  dashboardStats,
-  recentActivities,
-  quickActions,
-  nftItems,
-} from "@/lib/mocks";
 import { useDashboard } from "@/hooks/use-dashboard"
 import { useNFTs } from "@/hooks/use-nfts"
 

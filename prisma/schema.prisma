@@ -35,6 +35,12 @@ model User {
   assignedWallet   String?
   walletAssignedAt DateTime?
 
+  notificationSettings UserNotificationSettings?
+
+  externalWalletSeed       String?   @db.Text
+  externalWalletConfigured Boolean   @default(false)
+  seedPhraseConfiguredAt   DateTime?
+
   // Relations
   accounts                Account[]
   sessions                Session[]
@@ -55,6 +61,20 @@ model User {
   ExhibitionParticipation ExhibitionParticipation[]
 
   @@map("users")
+}
+
+model UserNotificationSettings {
+  id                 String  @id @default(uuid())
+  userId             String  @unique
+  emailNotifications Boolean @default(true)
+  pushNotifications  Boolean @default(true)
+  salesAlerts        Boolean @default(true)
+  bidAlerts          Boolean @default(true)
+  exhibitionUpdates  Boolean @default(true)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_notification_settings")
 }
 
 model PlatformWallet {
@@ -153,7 +173,7 @@ model NFTItem {
 model Transaction {
   id              String            @id @default(uuid())
   transactionHash String            @unique
-  nftItemId       String
+  nftItemId       String?
   fromUserId      String?
   toUserId        String?
   transactionType TransactionType
@@ -174,9 +194,9 @@ model Transaction {
   confirmedAt DateTime?
 
   // Relations
-  nftItem  NFTItem @relation(fields: [nftItemId], references: [id], onDelete: Cascade)
-  fromUser User?   @relation("TransactionSender", fields: [fromUserId], references: [id])
-  toUser   User?   @relation("TransactionReceiver", fields: [toUserId], references: [id])
+  nftItem  NFTItem? @relation(fields: [nftItemId], references: [id], onDelete: Cascade)
+  fromUser User?    @relation("TransactionSender", fields: [fromUserId], references: [id])
+  toUser   User?    @relation("TransactionReceiver", fields: [toUserId], references: [id])
 
   @@map("transactions")
 }
@@ -345,7 +365,7 @@ model EscrowTransaction {
 model WithdrawalRequest {
   id                 String           @id @default(uuid())
   userId             String
-  nftItemId          String
+  nftItemId          String?
   destinationAddress String
   destinationNetwork String
   withdrawalFee      Float?
@@ -356,8 +376,8 @@ model WithdrawalRequest {
   completedAt DateTime?
 
   // Relations
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  nftItem NFTItem @relation(fields: [nftItemId], references: [id], onDelete: Cascade)
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  nftItem NFTItem? @relation(fields: [nftItemId], references: [id], onDelete: Cascade)
 
   @@map("withdrawal_requests")
 }

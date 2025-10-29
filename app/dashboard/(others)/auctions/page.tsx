@@ -211,11 +211,11 @@ export default function AuctionsPage() {
                   <CardHeader className="pb-4">
                     <div className="flex items-start justify-between mb-2">
                       <CardTitle className="text-lg">
-                        {auction.nftName}
+                        {auction.nftItem?.name}
                       </CardTitle>
                       {getStatusBadge(auction.status)}
                     </div>
-                    <CardDescription>{auction.collection}</CardDescription>
+                    <CardDescription>{auction.nftItem?.collection?.name}</CardDescription>
                   </CardHeader>
 
                   <CardContent className="space-y-4">
@@ -252,7 +252,7 @@ export default function AuctionsPage() {
                               : "Current Bid"}
                           </p>
                           <p className="font-semibold text-lg">
-                            {auction.currentBid || auction.finalBid || 0} ETH
+                            {auction.buyNowPrice || auction.startingPrice || 0} ETH
                           </p>
                         </div>
                       </div>
@@ -297,18 +297,18 @@ export default function AuctionsPage() {
                         </div>
                       )}
 
-                      {auction.status === "ended" && (
+                      {/* {auction.status === "ended" && (
                         <div className="space-y-2 text-sm">
                           <div>
                             <p className="text-muted-foreground">
                               Winning Bidder
                             </p>
                             <p className="font-semibold">
-                              {auction.winningBidder || "Unknown"}
+                              {auction. || "Unknown"}
                             </p>
                           </div>
                         </div>
-                      )}
+                      )} */}
 
                       <div className="flex items-center justify-between pt-2">
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">

@@ -272,7 +272,7 @@ export default function ExhibitionsPage() {
                     >
                       <CardContent className="p-0">
                         {/* Exhibition Image */}
-                        <div className="relative h-48 bg-gradient-to-br from-blue-500/10 to-purple-500/10 overflow-hidden">
+                        <div className="relative h-48 bg-linear-to-br from-blue-500/10 to-purple-500/10 overflow-hidden">
                           {exhibition.image ? (
                             <img
                               src={exhibition.image}

@@ -3,9 +3,9 @@ import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
 
 interface RouteParams {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export async function POST(request: NextRequest, { params }: RouteParams) {
@@ -15,7 +15,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await params;
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
       select: { id: true },
@@ -135,7 +135,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await params;
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
       select: { id: true },

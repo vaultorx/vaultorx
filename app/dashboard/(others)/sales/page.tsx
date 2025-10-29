@@ -259,7 +259,7 @@ export default function SalesPage() {
                         <CardContent className="p-6">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-4 flex-1">
-                              <div className="w-16 h-16 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-lg flex items-center justify-center border">
+                              <div className="w-16 h-16 bg-linear-to-br from-blue-500/10 to-purple-500/10 rounded-lg flex items-center justify-center border">
                                 <ShoppingCart className="h-6 w-6 text-blue-500" />
                               </div>
                               <div className="flex-1">
@@ -416,7 +416,7 @@ export default function SalesPage() {
                           className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
                         >
                           <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-lg flex items-center justify-center border">
+                            <div className="w-12 h-12 bg-linear-to-br from-green-500/10 to-emerald-500/10 rounded-lg flex items-center justify-center border">
                               <DollarSign className="h-5 w-5 text-green-500" />
                             </div>
                             <div>

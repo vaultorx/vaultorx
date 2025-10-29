@@ -99,7 +99,7 @@ export async function GET(request: NextRequest) {
     const recentActivities = recentTransactions.map((tx) => ({
       id: tx.id,
       type: tx.transactionType as any,
-      nftName: tx.nftName || tx.nftItem.name,
+      nftName: tx.nftName || tx.nftItem?.name,
       price: tx.price,
       currency: tx.currency,
       from: tx.from,

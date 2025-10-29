@@ -2,14 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
 interface RouteParams {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "20");
@@ -96,7 +96,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       return {
         id: transaction.id,
         type,
-        nftName: transaction.nftItem.name,
+        nftName: transaction?.nftItem?.name,
         price: transaction.price,
         from:
           transaction.fromUser?.username ||
@@ -108,7 +108,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
           transaction.to,
         txHash: transaction.transactionHash,
         timestamp: transaction.createdAt,
-        nftId: transaction.nftItem.id,
+        nftId: transaction?.nftItem?.id,
       };
     });
 

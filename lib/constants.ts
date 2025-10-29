@@ -20,9 +20,9 @@ export const CATEGORIES: Array<{
 
 export const SUPPORTED_BLOCKCHAINS = [
   { id: "ethereum", name: "Ethereum", symbol: "ETH" },
-  { id: "polygon", name: "Polygon", symbol: "MATIC" },
-  { id: "arbitrum", name: "Arbitrum", symbol: "ETH" },
-  { id: "optimism", name: "Optimism", symbol: "ETH" },
+  // { id: "polygon", name: "Polygon", symbol: "MATIC" },
+  // { id: "arbitrum", name: "Arbitrum", symbol: "ETH" },
+  // { id: "optimism", name: "Optimism", symbol: "ETH" },
 ]
 
 export const SUPPORTED_CURRENCIES = [
@@ -35,3 +35,11 @@ export const SUPPORTED_CURRENCIES = [
 export const PLATFORM_FEE_BPS = 250 // 2.5%
 export const MAX_ROYALTY_BPS = 1000 // 10%
 export const WITHDRAWAL_LOCK_HOURS = 24
+
+export const WITHDRAWAL_FEES = {
+  ethereum: "0.005",
+  // polygon: "0.001",
+  // arbitrum: "0.0005",
+  // optimism: "0.0005",
+  // base: "0.0005",
+};

@@ -21,7 +21,6 @@ import type { NFTItem } from "@/lib/types";
 import { CompactNFTCard } from "@/components/compact-card";
 import { motion, AnimatePresence } from "framer-motion";
 import { Input } from "@/components/ui/input";
-import { mockNFTs } from "@/static-data/markeplace.mock";
 import MarketplaceClient from "./component/markeplace-client";
 import { HomeFooter } from "@/components/home-footer";
 

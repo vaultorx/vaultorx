@@ -286,7 +286,7 @@ export interface QuickAction {
   id: string;
   title: string;
   description: string;
-  icon: LucideIcon | string;
+  icon: LucideIcon;
   href: string;
   color: string;
   enabled: boolean;

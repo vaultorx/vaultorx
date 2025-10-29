@@ -8,9 +8,7 @@ import { getCategoryDisplayName } from "@/lib/validations/exhibition";
 import Image from "next/image";
 
 interface PageProps {
-  params: {
-    id: string;
-  };
+  params: Promise<{ id: string }>;
 }
 
 async function getExhibition(id: string) {
@@ -28,7 +26,9 @@ async function getExhibition(id: string) {
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
-  const data = await getExhibition(params.id);
+  const { id } = await params;
+
+  const data = await getExhibition(id);
   const exhibition = data?.data;
 
   if (!exhibition) {
@@ -49,7 +49,8 @@ export async function generateMetadata({
 }
 
 export default async function ExhibitionPage({ params }: PageProps) {
-  const data = await getExhibition(params.id);
+  const { id } = await params;
+  const data = await getExhibition(id);
   const exhibition = data?.data;
 
   if (!exhibition) {

@@ -3,14 +3,14 @@ import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
 
 interface RouteParams {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     const exhibition = await prisma.exhibition.findUnique({
       where: { id },
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
           },
         },
         collections: true,
-        nfts:true,
+        nfts: true,
         _count: {
           select: {
             collections: true,
@@ -70,7 +70,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await params;
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
       select: { id: true },
@@ -123,7 +123,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await params;
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
       select: { id: true },
