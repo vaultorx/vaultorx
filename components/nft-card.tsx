@@ -35,11 +35,11 @@ export function NFTCard({
   const getRarityColor = (rarity: string) => {
     const colors = {
       Common:
-        "bg-gray-500/20 text-gray-700 dark:text-gray-300 border-gray-500/30",
-      Rare: "bg-blue-500/20 text-blue-700 dark:text-blue-300 border-blue-500/30",
-      Epic: "bg-purple-500/20 text-purple-700 dark:text-purple-300 border-purple-500/30",
+        "bg-gray-500/10 text-gray-900 border-gray-500/30",
+      Rare: "bg-blue-500/10 text-blue-900 border-blue-500/30",
+      Epic: "bg-purple-500/10 text-purple-900 border-purple-500/30",
       Legendary:
-        "bg-yellow-500/20 text-yellow-700 dark:text-yellow-300 border-yellow-500/30",
+        "bg-orange-500/10 text-orange-900 border-orange-500/30",
     };
     return colors[rarity as keyof typeof colors] || colors.Common;
   };
@@ -80,7 +80,7 @@ export function NFTCard({
               <h3 className="font-semibold text-sm truncate mb-1">
                 {nft.name}
               </h3>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-1 items-center gap-2">
                 <Badge
                   variant="outline"
                   className={`text-xs px-1.5 py-0 h-5 ${getRarityColor(
@@ -97,7 +97,7 @@ export function NFTCard({
               </div>
             </div>
 
-            <div className="text-right flex-shrink-0">
+            <div className="text-right shrink-0">
               {nft.isListed ? (
                 <div>
                   <p className="font-bold text-sm">
@@ -192,7 +192,7 @@ export function NFTCard({
               </div>
               <Badge
                 variant="outline"
-                className={`ml-2 flex-shrink-0 ${getRarityColor(nft.rarity)}`}
+                className={`ml-2 shrink-0 ${getRarityColor(nft.rarity)}`}
               >
                 {nft.rarity}
               </Badge>
@@ -205,10 +205,10 @@ export function NFTCard({
                     <Eye className="h-3 w-3" />
                     {nft.views.toLocaleString()}
                   </span>
-                  <span className="flex items-center gap-1">
+                  {/* <span className="flex items-center gap-1">
                     <Heart className="h-3 w-3" />
                     {nft.likes.toLocaleString()}
-                  </span>
+                  </span> */}
                 </div>
                 <div className="text-right">
                   <p className="text-xs text-muted-foreground">Created</p>
@@ -234,7 +234,7 @@ export function NFTCard({
                 <div className="text-right">
                   <p className="text-sm text-muted-foreground mb-1">Floor</p>
                   <p className="text-lg font-semibold">
-                    {nft.collection.floorPrice} ETH
+                    {nft.collection.floorPrice.toFixed(4)} ETH
                   </p>
                 </div>
               )}
@@ -280,7 +280,7 @@ export function NFTCard({
           )}
 
           {/* Status Badges */}
-          <div className="absolute top-3 left-3 flex flex-col gap-2">
+          <div className="absolute top-3 left-3 flex gap-2">
             {nft.isListed && (
               <Badge className="bg-green-500/90 backdrop-blur text-white border-0 shadow-lg">
                 Listed
@@ -361,7 +361,7 @@ export function NFTCard({
               <div className="text-right">
                 <p className="text-xs text-muted-foreground mb-1">Floor</p>
                 <p className="text-sm font-semibold">
-                  {nft.collection.floorPrice} ETH
+                  {nft.collection.floorPrice?.toFixed(4)} ETH
                 </p>
               </div>
             )}
@@ -377,10 +377,10 @@ export function NFTCard({
                 <Heart className="h-3 w-3" />
                 <span>{nft.likes.toLocaleString()} likes</span>
               </div>
-              <div className="flex items-center gap-1">
+              {/* <div className="flex items-center gap-1">
                 <TrendingUp className="h-3 w-3" />
                 <span>2.5 ETH</span>
-              </div>
+              </div> */}
             </div>
           )}
         </CardContent>

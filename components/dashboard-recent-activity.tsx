@@ -9,10 +9,12 @@ import { format } from "date-fns";
 
 interface DashboardActivityProps {
   activities: RecentActivity[];
+  loading?: boolean;
 }
 
 export function DashboardRecentActivity({
   activities,
+  loading
 }: DashboardActivityProps) {
 
   const getActivityBadge = (type: RecentActivity["type"]) => {
@@ -31,6 +33,30 @@ export function DashboardRecentActivity({
       </Badge>
     );
   };
+
+   if (loading) {
+     return (
+       <Card>
+         <CardHeader>
+           <CardTitle>Recent Activity</CardTitle>
+         </CardHeader>
+         <CardContent>
+           <div className="space-y-4">
+             {[...Array(5)].map((_, i) => (
+               <div key={i} className="flex items-center gap-4 animate-pulse">
+                 <div className="h-10 w-10 bg-muted rounded-full"></div>
+                 <div className="space-y-2 flex-1">
+                   <div className="h-4 bg-muted rounded w-3/4"></div>
+                   <div className="h-3 bg-muted rounded w-1/2"></div>
+                 </div>
+               </div>
+             ))}
+           </div>
+         </CardContent>
+       </Card>
+     );
+   }
+
 
   return (
     <Card>
@@ -71,7 +97,7 @@ export function DashboardRecentActivity({
               <Button
                 variant="ghost"
                 size="icon"
-                className="flex-shrink-0"
+                className="shrink-0"
                 asChild
               >
                 <a

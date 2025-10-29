@@ -4,6 +4,7 @@ import { LucideIcon } from "lucide-react";
 export interface User {
   id: string;
   username?: string;
+  name?: string;
   // walletAddress: string;
   email?: string;
   emailVerified: boolean;
@@ -32,6 +33,7 @@ export interface Collection {
   verified?: boolean;
   category?: string;
   image?: string;
+  creator: User;
 }
 
 export interface NFTCategory {
@@ -40,6 +42,7 @@ export interface NFTCategory {
   icon: LucideIcon | string;
   color?: string;
   nfts: NFTItem[];
+  nftCount?: number;
 }
 export interface NFTItem {
   id: string;
@@ -127,6 +130,7 @@ export interface CategoryItem {
 
 // Dashboard specific types
 export interface DashboardStats {
+  walletBalance: number;
   totalCollections: number;
   totalNFTs: number;
   floorValue: number;
@@ -194,26 +198,67 @@ export interface Exhibition {
   totalNFTs: number;
   curator: string;
   image: string;
+  locationType: string;
+  venueName?: string;
+  views: number;
+  likes: number;
+  featured: boolean;
+  _count?: any;
 }
 
 export interface Auction {
   id: string;
-  nftName: string;
-  collection: string;
-  type: "english" | "dutch" | "vickrey";
+  nftItemId: string;
+  type:
+    | "STANDARD"
+    | "RESERVE"
+    | "TIMED"
+    | "DUTCH"
+    | "BLIND"
+    | "LOTTERY"
+    | "BUY_NOW"
+    | "MULTI_TOKEN";
   status: "live" | "upcoming" | "ended" | "cancelled";
-  currentBid?: number;
-  minimumBid?: number;
   startingPrice?: number;
   reservePrice?: number;
+  minimumBid?: number;
   bidIncrement?: number;
+  buyNowPrice?: number;
+  ticketPrice?: number;
+  maxTickets?: number;
   startTime: string;
   endTime: string;
   bidders: number;
   views: number;
-  image: string;
-  winningBidder?: string;
-  finalBid?: number;
+  blockchain: string;
+  contractAddress?: string;
+  tokenStandard: string;
+  createdAt: Date;
+  updatedAt: Date;
+  nftItem?: NFTItem;
+  bids?: Bid[];
+  tickets?: LotteryTicket[];
+}
+
+export interface LotteryTicket {
+  id: string;
+  auctionId: string;
+  buyerId: string;
+  tickets: number;
+  txHash?: string;
+  createdAt: Date;
+  auction?: Auction;
+  buyer?: User;
+}
+
+export interface Bid {
+  id: string;
+  auctionId: string;
+  bidderId: string;
+  amount: number;
+  createdAt: Date;
+  auction?: Auction;
+  bidder?: User;
 }
 
 export interface WhitelistedAddress {
@@ -269,6 +314,7 @@ export interface FilterOptions {
   sortOrder?: "asc" | "desc";
   page?: number;
   limit?: number;
+  timeRange?: string;
 }
 
 // Form types

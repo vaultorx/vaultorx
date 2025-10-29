@@ -10,8 +10,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -31,19 +32,52 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  assignedWallet   String?
+  walletAssignedAt DateTime?
+
   // Relations
-  accounts             Account[]
-  sessions             Session[]
-  createdCollections   Collection[]         @relation("CollectionCreator")
-  ownedNFTs            NFTItem[]            @relation("NFTOwner")
-  sentTransactions     Transaction[]        @relation("TransactionSender")
-  receivedTransactions Transaction[]        @relation("TransactionReceiver")
-  buyerEscrows         EscrowTransaction[]  @relation("EscrowBuyer")
-  sellerEscrows        EscrowTransaction[]  @relation("EscrowSeller")
-  withdrawalRequests   WithdrawalRequest[]
-  WhitelistedAddress   WhitelistedAddress[]
+  accounts                Account[]
+  sessions                Session[]
+  createdCollections      Collection[]              @relation("CollectionCreator")
+  ownedNFTs               NFTItem[]                 @relation("NFTOwner")
+  sentTransactions        Transaction[]             @relation("TransactionSender")
+  receivedTransactions    Transaction[]             @relation("TransactionReceiver")
+  buyerEscrows            EscrowTransaction[]       @relation("EscrowBuyer")
+  sellerEscrows           EscrowTransaction[]       @relation("EscrowSeller")
+  withdrawalRequests      WithdrawalRequest[]
+  whitelistedAddress      WhitelistedAddress[]
+  bid                     Bid[]
+  DepositRequest          DepositRequest[]
+  LotteryTicket           LotteryTicket[]
+  PurchaseSession         PurchaseSession[]
+  PlatformWallet          PlatformWallet?           @relation(fields: [assignedWallet], references: [address], onDelete: SetNull)
+  Exhibition              Exhibition[]
+  ExhibitionParticipation ExhibitionParticipation[]
 
   @@map("users")
+}
+
+model PlatformWallet {
+  id         String       @id @default(uuid())
+  address    String       @unique
+  index      Int          @unique
+  status     WalletStatus @default(available)
+  assignedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations - One wallet can have many users
+  users User[]
+
+  @@map("platform_wallets")
+}
+
+enum WalletStatus {
+  available
+  assigned
+  maintenance
+  disabled
 }
 
 model Collection {
@@ -68,8 +102,12 @@ model Collection {
   updatedAt DateTime @updatedAt
 
   // Relations
-  creator User      @relation("CollectionCreator", fields: [creatorId], references: [id], onDelete: Cascade)
-  nfts    NFTItem[]
+  creator                           User                                @relation("CollectionCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+  nfts                              NFTItem[]
+  Exhibition                        Exhibition?                         @relation(fields: [exhibitionId], references: [id])
+  exhibitionId                      String?
+  ExhibitionCollection              ExhibitionCollection[]
+  ExhibitionParticipationCollection ExhibitionParticipationCollection[]
 
   @@map("collections")
 }
@@ -96,11 +134,17 @@ model NFTItem {
   updatedAt DateTime @updatedAt
 
   // Relations
-  collection         Collection          @relation(fields: [collectionId], references: [id], onDelete: Cascade)
-  owner              User                @relation("NFTOwner", fields: [ownerId], references: [id], onDelete: Cascade)
-  transactions       Transaction[]
-  escrows            EscrowTransaction[]
-  withdrawalRequests WithdrawalRequest[]
+  collection                 Collection                   @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  owner                      User                         @relation("NFTOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  transactions               Transaction[]
+  escrows                    EscrowTransaction[]
+  withdrawalRequests         WithdrawalRequest[]
+  auctions                   Auction[]
+  PurchaseSession            PurchaseSession[]
+  Exhibition                 Exhibition?                  @relation(fields: [exhibitionId], references: [id])
+  exhibitionId               String?
+  ExhibitionNFT              ExhibitionNFT[]
+  ExhibitionParticipationNFT ExhibitionParticipationNFT[]
 
   @@unique([collectionId, tokenId])
   @@map("nft_items")
@@ -135,6 +179,145 @@ model Transaction {
   toUser   User?   @relation("TransactionReceiver", fields: [toUserId], references: [id])
 
   @@map("transactions")
+}
+
+model Exhibition {
+  id          String  @id @default(uuid())
+  title       String
+  description String?
+  image       String?
+  bannerImage String?
+
+  // Exhibition details
+  startDate DateTime
+  endDate   DateTime
+  status    ExhibitionStatus @default(upcoming)
+  category  String?
+  tags      String[]
+
+  // Location details (virtual/physical)
+  locationType LocationType @default(virtual)
+  venueName    String?
+  venueAddress String?
+  virtualUrl   String?
+
+  // Stats
+  views    Int     @default(0)
+  likes    Int     @default(0)
+  featured Boolean @default(false)
+
+  // Relations
+  creatorId   String
+  creator     User         @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  collections Collection[]
+  nfts        NFTItem[]
+
+  // Timestamps
+  createdAt               DateTime                  @default(now())
+  updatedAt               DateTime                  @updatedAt
+  exhibitionCollections   ExhibitionCollection[]
+  exhibitionNFTs          ExhibitionNFT[]
+  ExhibitionParticipation ExhibitionParticipation[]
+
+  @@map("exhibitions")
+}
+
+model ExhibitionCollection {
+  id           String @id @default(uuid())
+  exhibitionId String
+  collectionId String
+  order        Int    @default(0)
+
+  exhibition Exhibition @relation(fields: [exhibitionId], references: [id], onDelete: Cascade)
+  collection Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  @@unique([exhibitionId, collectionId])
+  @@map("exhibition_collections")
+}
+
+model ExhibitionNFT {
+  id           String  @id @default(uuid())
+  exhibitionId String
+  nftItemId    String
+  order        Int     @default(0)
+  featured     Boolean @default(false)
+
+  exhibition Exhibition @relation(fields: [exhibitionId], references: [id], onDelete: Cascade)
+  nftItem    NFTItem    @relation(fields: [nftItemId], references: [id], onDelete: Cascade)
+
+  @@unique([exhibitionId, nftItemId])
+  @@map("exhibition_nfts")
+}
+
+model ExhibitionParticipation {
+  id           String              @id @default(uuid())
+  exhibitionId String
+  userId       String
+  status       ParticipationStatus @default(pending)
+
+  // What the user wants to submit
+  nftItems    ExhibitionParticipationNFT[]
+  collections ExhibitionParticipationCollection[]
+
+  // Additional information
+  message String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  exhibition Exhibition @relation(fields: [exhibitionId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([exhibitionId, userId])
+  @@map("exhibition_participations")
+}
+
+model ExhibitionParticipationNFT {
+  id              String @id @default(uuid())
+  participationId String
+  nftItemId       String
+  order           Int    @default(0)
+
+  participation ExhibitionParticipation @relation(fields: [participationId], references: [id], onDelete: Cascade)
+  nftItem       NFTItem                 @relation(fields: [nftItemId], references: [id], onDelete: Cascade)
+
+  @@unique([participationId, nftItemId])
+  @@map("exhibition_participation_nfts")
+}
+
+model ExhibitionParticipationCollection {
+  id              String @id @default(uuid())
+  participationId String
+  collectionId    String
+  order           Int    @default(0)
+
+  participation ExhibitionParticipation @relation(fields: [participationId], references: [id], onDelete: Cascade)
+  collection    Collection              @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  @@unique([participationId, collectionId])
+  @@map("exhibition_participation_collections")
+}
+
+enum ParticipationStatus {
+  pending
+  approved
+  rejected
+  withdrawn
+}
+
+enum ExhibitionStatus {
+  draft
+  upcoming
+  active
+  ended
+  cancelled
+}
+
+enum LocationType {
+  virtual
+  physical
+  hybrid
 }
 
 model EscrowTransaction {
@@ -244,6 +427,120 @@ model PasswordResetToken {
   @@index([email, token])
 }
 
+model Auction {
+  id              String        @id @default(uuid())
+  nftItemId       String
+  type            AuctionType
+  status          AuctionStatus @default(upcoming)
+  startingPrice   Float?
+  reservePrice    Float?
+  minimumBid      Float?
+  bidIncrement    Float?
+  buyNowPrice     Float? // Added for BUY_NOW auctions
+  ticketPrice     Float? // Added for LOTTERY auctions
+  maxTickets      Int? // Added for LOTTERY auctions
+  startTime       DateTime
+  endTime         DateTime
+  bidders         Int           @default(0)
+  views           Int           @default(0)
+  blockchain      String        @default("ethereum")
+  contractAddress String? // Smart contract address for on-chain auctions
+  tokenStandard   String        @default("ERC721") // ERC721 or ERC1155
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  nftItem NFTItem         @relation(fields: [nftItemId], references: [id], onDelete: Cascade)
+  bids    Bid[]
+  tickets LotteryTicket[] // For lottery auctions
+
+  @@map("auctions")
+}
+
+model LotteryTicket {
+  id        String  @id @default(uuid())
+  auctionId String
+  buyerId   String
+  tickets   Int     @default(1)
+  txHash    String?
+
+  createdAt DateTime @default(now())
+
+  auction Auction @relation(fields: [auctionId], references: [id], onDelete: Cascade)
+  buyer   User    @relation(fields: [buyerId], references: [id], onDelete: Cascade)
+
+  @@unique([auctionId, buyerId])
+  @@map("lottery_tickets")
+}
+
+model Bid {
+  id        String @id @default(uuid())
+  auctionId String
+  bidderId  String
+  amount    Float
+
+  createdAt DateTime @default(now())
+
+  // Relations
+  auction Auction @relation(fields: [auctionId], references: [id], onDelete: Cascade)
+  bidder  User    @relation(fields: [bidderId], references: [id], onDelete: Cascade)
+
+  @@map("bids")
+}
+
+model DepositRequest {
+  id              String        @id @default(uuid())
+  userId          String
+  transactionHash String?       @unique
+  amount          Float
+  currency        String        @default("ETH")
+  status          DepositStatus @default(pending)
+  adminNotes      String?
+
+  createdAt   DateTime  @default(now())
+  approvedAt  DateTime?
+  processedAt DateTime?
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("deposit_requests")
+}
+
+model PurchaseSession {
+  id              String                @id @default(uuid())
+  userId          String
+  nftItemId       String
+  amount          Float
+  currency        String                @default("ETH")
+  status          PurchaseSessionStatus @default(pending)
+  expiresAt       DateTime
+  transactionHash String?
+  adminNotified   Boolean               @default(false)
+
+  // Additional data for the purchase
+  nftData Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  nftItem NFTItem @relation(fields: [nftItemId], references: [id], onDelete: Cascade)
+
+  @@map("purchase_sessions")
+}
+
+enum PurchaseSessionStatus {
+  pending
+  processing
+  completed
+  expired
+  cancelled
+  failed
+}
+
 ////////////////////
 ////////////////////
 ////////////////////
@@ -296,4 +593,29 @@ enum WithdrawalStatus {
   processing
   completed
   failed
+}
+
+enum AuctionType {
+  STANDARD // Traditional highest bidder wins
+  RESERVE // Must meet reserve price
+  TIMED // Fixed duration, highest bid wins
+  DUTCH // Price decreases over time
+  BLIND // Sealed bids revealed at end
+  LOTTERY // Participants buy tickets, random winner
+  BUY_NOW // Fixed price with auction option
+  MULTI_TOKEN // Bundle of NFTs auctioned together
+}
+
+enum AuctionStatus {
+  live
+  upcoming
+  ended
+  cancelled
+}
+
+enum DepositStatus {
+  pending
+  approved
+  rejected
+  completed
 }

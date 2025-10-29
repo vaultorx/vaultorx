@@ -1,17 +1,21 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { NFTCard } from "@/components/nft-card"
-import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import type { NFTItem } from "@/lib/types"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { NFTCard } from "@/components/nft-card";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type { NFTItem } from "@/lib/types";
 
 interface DashboardNFTGridProps {
-  ownedNFTs: NFTItem[]
-  listedNFTs: NFTItem[]
+  ownedNFTs: NFTItem[];
+  listedNFTs: NFTItem[];
+  loading?: boolean;
 }
 
-export function DashboardNFTGrid({ ownedNFTs, listedNFTs }: DashboardNFTGridProps) {
+export function DashboardNFTGrid({
+  ownedNFTs,
+  listedNFTs,
+}: DashboardNFTGridProps) {
   return (
     <Card>
       <CardHeader>
@@ -21,7 +25,9 @@ export function DashboardNFTGrid({ ownedNFTs, listedNFTs }: DashboardNFTGridProp
         <Tabs defaultValue="owned" className="w-full">
           <TabsList className="grid w-full max-w-md grid-cols-2 gap-3">
             <TabsTrigger value="owned">Owned ({ownedNFTs.length})</TabsTrigger>
-            <TabsTrigger value="listed">Listed ({listedNFTs.length})</TabsTrigger>
+            <TabsTrigger value="listed">
+              Listed ({listedNFTs.length})
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="owned" className="mt-6">
@@ -33,7 +39,9 @@ export function DashboardNFTGrid({ ownedNFTs, listedNFTs }: DashboardNFTGridProp
               </div>
             ) : (
               <div className="text-center py-12">
-                <p className="text-muted-foreground mb-4">You don't own any NFTs yet</p>
+                <p className="text-muted-foreground mb-4">
+                  You don't own any NFTs yet
+                </p>
                 <Button>Explore Marketplace</Button>
               </div>
             )}
@@ -48,7 +56,9 @@ export function DashboardNFTGrid({ ownedNFTs, listedNFTs }: DashboardNFTGridProp
               </div>
             ) : (
               <div className="text-center py-12">
-                <p className="text-muted-foreground mb-4">You don't have any listed NFTs</p>
+                <p className="text-muted-foreground mb-4">
+                  You don't have any listed NFTs
+                </p>
                 <Button>List an NFT</Button>
               </div>
             )}
@@ -56,5 +66,5 @@ export function DashboardNFTGrid({ ownedNFTs, listedNFTs }: DashboardNFTGridProp
         </Tabs>
       </CardContent>
     </Card>
-  )
+  );
 }

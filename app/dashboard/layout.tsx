@@ -87,7 +87,10 @@ function AppSidebar() {
       <SidebarFooter className="p-4 border-t bg-gray-100">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton onClick={handleSignOut} className="cursor-pointer">
+            <SidebarMenuButton
+              onClick={handleSignOut}
+              className="cursor-pointer"
+            >
               <LogOut />
               <span>Sign Out</span>
             </SidebarMenuButton>
@@ -114,7 +117,7 @@ export default function DashboardLayout({
           <div className="sticky top-0 z-10 bg-white border-b border-b-gray-600 p-4 md:hidden">
             <SidebarTrigger />
           </div>
-          <div className="flex-1 p-6">{children}</div>
+            <div className="flex-1 p-6">{children}</div>
         </main>
       </div>
     </SidebarProvider>

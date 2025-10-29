@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { Search, Bell, Rocket, User, LogIn, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +12,8 @@ import { SearchCommand } from "./search-command";
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+
+  const { data: session, status } = useSession();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -90,38 +93,58 @@ export function Header() {
             </motion.button>
 
             {/* Auth Buttons */}
-            <div className="flex items-center gap-2">
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Link href="/login">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white gap-2"
-                  >
-                    <LogIn className="h-4 w-4" />
-                    Login
-                  </Button>
-                </Link>
-              </motion.div>
+            {status === "unauthenticated" || status === "loading" ? (
+              <div className="flex items-center gap-2">
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Link href="/login">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white gap-2"
+                    >
+                      <LogIn className="h-4 w-4" />
+                      Login
+                    </Button>
+                  </Link>
+                </motion.div>
 
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Link href="/signup">
-                  <Button
-                    size="sm"
-                    className="bg-blue-500 gap-2 hover:bg-blue-600"
-                  >
-                    <UserPlus className="h-4 w-4" />
-                    Sign Up
-                  </Button>
-                </Link>
-              </motion.div>
-            </div>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Link href="/signup">
+                    <Button
+                      size="sm"
+                      className="bg-blue-500 gap-2 hover:bg-blue-600"
+                    >
+                      <UserPlus className="h-4 w-4" />
+                      Sign Up
+                    </Button>
+                  </Link>
+                </motion.div>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Link href="/dashboard">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white gap-2"
+                    >
+                      <User className="h-4 w-4" />
+                      Dashboard
+                    </Button>
+                  </Link>
+                </motion.div>
+              </div>
+            )}
           </div>
         </div>
       </motion.header>

@@ -15,7 +15,8 @@ import { cn } from "@/lib/utils";
 import { stat } from "fs";
 
 interface DashboardStatsProps {
-  stats: DashboardStatsType;
+  stats: DashboardStatsType | null;
+  loading?: boolean;
 }
 
 interface StatCardProps {
@@ -59,30 +60,49 @@ function StatCard({ title, value, change, icon }: StatCardProps) {
   );
 }
 
-export function DashboardStats({ stats }: DashboardStatsProps) {
+export function DashboardStats({ stats, loading }: DashboardStatsProps) {
+  if (loading) {
+    return (
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {[...Array(4)].map((_, i) => (
+          <Card key={i} className="animate-pulse">
+            <CardContent className="p-6">
+              <div className="space-y-2">
+                <div className="h-4 bg-muted rounded w-1/2"></div>
+                <div className="h-8 bg-muted rounded w-3/4"></div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
+  }
+
+  if (!stats) return null;
+
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <StatCard
         title="Wallet Balance"
-        value="12.45 ETH"
+        value={`${stats?.walletBalance?.toFixed(4) || 0} ETH`}
         change={8.2}
         icon={<Wallet className="h-6 w-6" />}
       />
       <StatCard
         title="Total NFTs"
-        value={stats.totalSales.toString()}
-        change={stats.successRate}
+        value={stats?.totalSales.toString() || "0"}
+        change={stats?.successRate}
         icon={<ShoppingBag className="h-6 w-6" />}
       />
       <StatCard
         title="Total Value"
-        value={stats.avgSalePrice + " ETH"}
-        change={stats.successRate - 5}
+        value={stats?.avgSalePrice + " ETH"}
+        change={(stats?.successRate || 0) - 5}
         icon={<DollarSign className="h-6 w-6" />}
       />
       <StatCard
         title="Active Listings"
-        value={stats.activeListings.toString()}
+        value={stats?.activeListings.toString() || "0"}
         icon={<Activity className="h-6 w-6" />}
       />
     </div>

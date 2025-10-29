@@ -86,7 +86,7 @@ async function createSuperAdmin() {
         name,
         password: hashedPassword,
         role: UserRole.SUPERADMIN,
-        emailVerified: new Date(),
+        emailVerified: true,
       },
     });
 

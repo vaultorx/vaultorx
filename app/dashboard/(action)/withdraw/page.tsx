@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Header } from "@/components/header";
 import {
   Card,
@@ -41,6 +41,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useWallet } from "@/hooks/use-wallet";
+import { useWhitelist } from "@/hooks/use-whitelist";
+import { useUserNFTs } from "@/hooks/use-user-nfts";
+import { useSession } from "next-auth/react";
 
 interface WhitelistedAddress {
   id: string;
@@ -51,6 +55,7 @@ interface WhitelistedAddress {
 }
 
 export default function WithdrawPage() {
+  const { data: session } = useSession();
   const [selectedNFT, setSelectedNFT] = useState("");
   const [destinationNetwork, setDestinationNetwork] = useState("");
   const [destinationAddress, setDestinationAddress] = useState("");
@@ -62,35 +67,85 @@ export default function WithdrawPage() {
   const [useWhitelisted, setUseWhitelisted] = useState(false);
   const [twoFactorEnabled] = useState(true);
 
-  // Mock whitelisted addresses
-  const [whitelistedAddresses] = useState<WhitelistedAddress[]>([
-    {
-      id: "1",
-      address: "0x1234567890abcdef1234567890abcdef12345678",
-      label: "My Hardware Wallet",
-      addedAt: new Date(Date.now() - 48 * 60 * 60 * 1000), // 2 days ago
-    },
-    {
-      id: "2",
-      address: "0xabcdefabcdefabcdefabcdefabcdefabcdefabcd",
-      label: "Cold Storage",
-      addedAt: new Date(Date.now() - 12 * 60 * 60 * 1000), // 12 hours ago
-      lockUntil: new Date(Date.now() + 12 * 60 * 60 * 1000), // Locked for 12 more hours
-    },
-  ]);
+  const {
+    withdrawNFT,
+    sendVerificationCode,
+    loading: walletLoading,
+    error: walletError,
+  } = useWallet();
+  const {
+    addresses: whitelistedAddresses,
+    loading: whitelistLoading,
+    addAddress,
+  } = useWhitelist();
+  const { nfts: userNFTs, loading: nftsLoading } = useUserNFTs();
 
-  const handleSendCode = () => {
-    setCodeSent(true);
-    // Simulate sending verification code
+  const [newAddressLabel, setNewAddressLabel] = useState("");
+  const [newAddress, setNewAddress] = useState("");
+  const [addingAddress, setAddingAddress] = useState(false);
+
+  useEffect(() => {
+    // Fetch withdrawal fee when network changes
+    if (destinationNetwork) {
+      // This would typically come from an API
+      setWithdrawalFee("0.005"); // Mock fee
+    }
+  }, [destinationNetwork]);
+
+  const handleSendCode = async () => {
+    if (!session?.user?.email) return;
+
+    try {
+      await sendVerificationCode(session.user.email);
+      setCodeSent(true);
+    } catch (error) {
+      // Error is handled by the hook
+    }
+  };
+
+  const handleAddAddress = async () => {
+    if (!newAddressLabel || !newAddress) return;
+
+    setAddingAddress(true);
+    try {
+      await addAddress({ address: newAddress, label: newAddressLabel });
+      setNewAddressLabel("");
+      setNewAddress("");
+      // Close dialog would be handled here
+    } catch (error) {
+      // Error is handled by the hook
+    } finally {
+      setAddingAddress(false);
+    }
   };
 
   const handleWithdraw = async () => {
+    if (
+      !selectedNFT ||
+      !destinationNetwork ||
+      !destinationAddress ||
+      !verificationCode
+    )
+      return;
+
     setIsProcessing(true);
-    // Simulate withdrawal process
-    setTimeout(() => {
+    try {
+      const response = await withdrawNFT({
+        selectedNFT,
+        destinationNetwork,
+        destinationAddress,
+        verificationCode,
+        useWhitelisted,
+      });
+
+      if (response.success) {
+        setWithdrawalComplete(true);
+      }
+    } catch (error) {
+      // Error is handled by the hook
+    } finally {
       setIsProcessing(false);
-      setWithdrawalComplete(true);
-    }, 3000);
+    }
   };
 
   const isAddressLocked = (address: WhitelistedAddress) => {
@@ -100,7 +155,6 @@ export default function WithdrawPage() {
   if (withdrawalComplete) {
     return (
       <div className="min-h-screen">
-        <Header />
         <div className="container mx-auto px-4 pt-24 sm:px-10 py-8">
           <div className="max-w-2xl mx-auto">
             <Card>
@@ -166,6 +220,14 @@ export default function WithdrawPage() {
             </Link>
           </Button>
 
+          {/* Error Alert */}
+          {walletError && (
+            <Alert variant="destructive" className="mb-6">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription>{walletError}</AlertDescription>
+            </Alert>
+          )}
+
           <Card>
             <CardHeader>
               <CardTitle>Withdraw NFT</CardTitle>
@@ -191,16 +253,33 @@ export default function WithdrawPage() {
                   Select NFT to Withdraw{" "}
                   <span className="text-destructive">*</span>
                 </Label>
-                <Select value={selectedNFT} onValueChange={setSelectedNFT}>
+                <Select
+                  value={selectedNFT}
+                  onValueChange={setSelectedNFT}
+                  disabled={nftsLoading}
+                >
                   <SelectTrigger id="nft">
-                    <SelectValue placeholder="Choose an NFT from your collection" />
+                    <SelectValue
+                      placeholder={
+                        nftsLoading
+                          ? "Loading your NFTs..."
+                          : "Choose an NFT from your collection"
+                      }
+                    />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="nft-1">Ethereal Dreams #1234</SelectItem>
-                    <SelectItem value="nft-2">Cosmic Vision #567</SelectItem>
-                    <SelectItem value="nft-3">Digital Horizon #89</SelectItem>
+                    {userNFTs.map((nft) => (
+                      <SelectItem key={nft.id} value={nft.id}>
+                        {nft.name} ({nft.collection?.name})
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
+                {nftsLoading && (
+                  <p className="text-xs text-muted-foreground">
+                    Loading your NFTs...
+                  </p>
+                )}
               </div>
 
               {/* Destination Network */}
@@ -267,67 +346,101 @@ export default function WithdrawPage() {
                         <div className="space-y-4 mt-4">
                           <div className="space-y-2">
                             <Label>Address Label</Label>
-                            <Input placeholder="e.g. My Ledger Wallet" />
+                            <Input
+                              placeholder="e.g. My Ledger Wallet"
+                              value={newAddressLabel}
+                              onChange={(e) =>
+                                setNewAddressLabel(e.target.value)
+                              }
+                            />
                           </div>
                           <div className="space-y-2">
                             <Label>Wallet Address</Label>
-                            <Input placeholder="0x..." />
+                            <Input
+                              placeholder="0x..."
+                              value={newAddress}
+                              onChange={(e) => setNewAddress(e.target.value)}
+                            />
                           </div>
-                          <Button className="w-full">Add to Whitelist</Button>
+                          <Button
+                            className="w-full"
+                            onClick={handleAddAddress}
+                            disabled={
+                              addingAddress || !newAddressLabel || !newAddress
+                            }
+                          >
+                            {addingAddress ? (
+                              <>
+                                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                                Adding...
+                              </>
+                            ) : (
+                              "Add to Whitelist"
+                            )}
+                          </Button>
                         </div>
                       </DialogContent>
                     </Dialog>
                   </div>
 
-                  <div className="space-y-2">
-                    {whitelistedAddresses.map((addr) => {
-                      const locked = isAddressLocked(addr);
-                      return (
-                        <button
-                          key={addr.id}
-                          onClick={() =>
-                            !locked && setDestinationAddress(addr.address)
-                          }
-                          disabled={locked}
-                          className={`w-full p-4 border border-border rounded-lg text-left transition-colors ${
-                            locked
-                              ? "opacity-50 cursor-not-allowed"
-                              : destinationAddress === addr.address
-                              ? "bg-primary/10 border-primary"
-                              : "hover:bg-muted/50"
-                          }`}
-                        >
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="flex-1 min-w-0">
-                              <p className="font-medium mb-1">{addr.label}</p>
-                              <p className="text-xs font-mono text-muted-foreground truncate">
-                                {addr.address}
-                              </p>
+                  {whitelistLoading ? (
+                    <div className="text-center py-4">
+                      <Loader2 className="h-4 w-4 animate-spin mx-auto" />
+                      <p className="text-sm text-muted-foreground mt-2">
+                        Loading addresses...
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {whitelistedAddresses.map((addr) => {
+                        const locked = isAddressLocked(addr);
+                        return (
+                          <button
+                            key={addr.id}
+                            onClick={() =>
+                              !locked && setDestinationAddress(addr.address)
+                            }
+                            disabled={locked}
+                            className={`w-full p-4 border border-border rounded-lg text-left transition-colors ${
+                              locked
+                                ? "opacity-50 cursor-not-allowed"
+                                : destinationAddress === addr.address
+                                ? "bg-primary/10 border-primary"
+                                : "hover:bg-muted/50"
+                            }`}
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="flex-1 min-w-0">
+                                <p className="font-medium mb-1">{addr.label}</p>
+                                <p className="text-xs font-mono text-muted-foreground truncate">
+                                  {addr.address}
+                                </p>
+                              </div>
+                              {locked && (
+                                <Badge
+                                  variant="secondary"
+                                  className="gap-1 shrink-0"
+                                >
+                                  <Clock className="h-3 w-3" />
+                                  Locked
+                                </Badge>
+                              )}
                             </div>
-                            {locked && (
-                              <Badge
-                                variant="secondary"
-                                className="gap-1 flex-shrink-0"
-                              >
-                                <Clock className="h-3 w-3" />
-                                Locked
-                              </Badge>
+                            {locked && addr.lockUntil && (
+                              <p className="text-xs text-muted-foreground mt-2">
+                                Available in{" "}
+                                {Math.ceil(
+                                  (addr.lockUntil.getTime() - Date.now()) /
+                                    (1000 * 60 * 60)
+                                )}{" "}
+                                hours
+                              </p>
                             )}
-                          </div>
-                          {locked && addr.lockUntil && (
-                            <p className="text-xs text-muted-foreground mt-2">
-                              Available in{" "}
-                              {Math.ceil(
-                                (addr.lockUntil.getTime() - Date.now()) /
-                                  (1000 * 60 * 60)
-                              )}{" "}
-                              hours
-                            </p>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -397,10 +510,16 @@ export default function WithdrawPage() {
                       <Button
                         variant="outline"
                         onClick={handleSendCode}
-                        disabled={codeSent}
+                        disabled={codeSent || walletLoading}
                         className="bg-transparent"
                       >
-                        {codeSent ? "Code Sent" : "Send Code"}
+                        {walletLoading ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : codeSent ? (
+                          "Code Sent"
+                        ) : (
+                          "Send Code"
+                        )}
                       </Button>
                     </div>
                     {codeSent && (
@@ -417,10 +536,11 @@ export default function WithdrawPage() {
                     disabled={
                       !verificationCode ||
                       verificationCode.length !== 6 ||
-                      isProcessing
+                      isProcessing ||
+                      walletLoading
                     }
                   >
-                    {isProcessing ? (
+                    {isProcessing || walletLoading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         Processing Withdrawal...

@@ -8,6 +8,7 @@ import { QuickAction } from "@/lib/types";
 
 interface DashboardQuickActionsProps {
   actions: QuickAction[];
+  loading?: boolean;
 }
 
 export function DashboardQuickActions({ actions }: DashboardQuickActionsProps) {

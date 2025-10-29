@@ -9,8 +9,8 @@ import {
 import { CompactNFTCard } from "@/components/compact-card";
 import { motion, AnimatePresence } from "framer-motion";
 import { Input } from "@/components/ui/input";
-import { mockNFTs } from "@/static-data/markeplace.mock";
 import { useSearchParams } from "next/navigation";
+import { useNFTs } from "@/hooks/use-nfts";
 
 const SORT_OPTIONS = [
   { value: "recent", label: "Recently Listed" },
@@ -25,9 +25,16 @@ export default function MarketplaceClient() {
   const [sortBy, setSortBy] = useState("recent");
   const [searchQuery, setSearchQuery] = useState("");
   const [showSortDropdown, setShowSortDropdown] = useState(false);
-
-  
+  const [page, setPage] = useState(1);
   const searchParams = useSearchParams();
+
+  const { nfts, loading, error, pagination, refetch } = useNFTs({
+    search: searchQuery,
+    sortBy,
+    sortOrder: sortBy === "price-low" ? "asc" : "desc",
+    page,
+    limit: 12,
+  });
 
   // Read search query from URL on component mount
   useEffect(() => {
@@ -39,7 +46,7 @@ export default function MarketplaceClient() {
 
   // Filter and sort NFTs
   const filteredNFTs = useMemo(() => {
-    let filtered = mockNFTs;
+    let filtered = nfts;
 
     // Search filter
     if (searchQuery) {
@@ -84,9 +91,32 @@ export default function MarketplaceClient() {
     return filtered;
   }, [searchQuery, sortBy]);
 
+ 
   const currentSortLabel =
     SORT_OPTIONS.find((opt) => opt.value === sortBy)?.label ||
     "Recently Listed";
+
+  const handleLoadMore = () => {
+    if (pagination && page < pagination.pages) {
+      setPage(page + 1);
+    }
+  };
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-slate-950 px-4 pt-24 sm:px-10 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-6xl mb-4">😞</div>
+          <h3 className="text-xl font-semibold text-white mb-2">
+            Failed to load NFTs
+          </h3>
+          <p className="text-slate-400 mb-4">{error}</p>
+          <Button onClick={() => refetch()}>Try Again</Button>
+        </div>
+      </div>
+    );
+  }
+
 
   return (
     <div className="min-h-screen bg-slate-950 px-4 pt-24 sm:px-10">
@@ -99,12 +129,13 @@ export default function MarketplaceClient() {
           transition={{ duration: 0.6 }}
         >
           <div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-3 bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
+            <h1 className="text-4xl md:text-5xl font-bold mb-3 bg-linear-to-r from-white to-slate-300 bg-clip-text text-transparent">
               Explore Marketplace
             </h1>
             <p className="text-lg text-slate-400">
-              Discover {filteredNFTs.length} unique digital assets across all
-              categories
+              {loading
+                ? "Loading..."
+                : `Discover ${filteredNFTs.length} unique digital assets across all categories`}
             </p>
           </div>
 
@@ -130,23 +161,27 @@ export default function MarketplaceClient() {
           <div className="flex items-center gap-6 text-sm text-slate-400 mb-4 lg:mb-0">
             <div>
               <span className="text-white font-semibold">
-                {filteredNFTs.length}
+                {loading ? "..." : filteredNFTs.length}
               </span>{" "}
               items
             </div>
             <div>
               <span className="text-white font-semibold">
-                {mockNFTs.filter((nft) => nft.isListed).length}
+                {loading
+                  ? "..."
+                  : filteredNFTs.filter((nft) => nft.isListed).length}
               </span>{" "}
               listed
             </div>
             <div>
               <span className="text-green-400 font-semibold">
-                {Math.round(
-                  (filteredNFTs.filter((nft) => nft.isListed).length /
-                    filteredNFTs.length) *
-                    100
-                )}
+                {loading
+                  ? "..."
+                  : Math.round(
+                      (filteredNFTs.filter((nft) => nft.isListed).length /
+                        Math.max(filteredNFTs.length, 1)) *
+                        100
+                    )}
                 %
               </span>{" "}
               available
@@ -174,7 +209,7 @@ export default function MarketplaceClient() {
               <AnimatePresence>
                 {showSortDropdown && (
                   <motion.div
-                    className="absolute top-full left-0 mt-2 w-48 bg-slate-800 border border-slate-700 rounded-xl shadow-lg pointer-events-auto z-[9999]"
+                    className="absolute top-full left-0 mt-2 w-48 bg-slate-800 border border-slate-700 rounded-xl shadow-lg pointer-events-auto z-9999"
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
@@ -236,7 +271,7 @@ export default function MarketplaceClient() {
             </AnimatePresence>
 
             {/* Load More */}
-            {filteredNFTs.length > 0 && (
+            {!loading && pagination && page < pagination.pages && (
               <motion.div
                 className="mt-12 text-center"
                 initial={{ opacity: 0, y: 20 }}
@@ -248,6 +283,7 @@ export default function MarketplaceClient() {
                   variant="outline"
                   size="lg"
                   className="border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white px-8"
+                  onClick={handleLoadMore}
                 >
                   Load More NFTs
                 </Button>

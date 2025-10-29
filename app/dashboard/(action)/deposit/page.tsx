@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Header } from "@/components/header";
 import {
   Card,
@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
 import { SUPPORTED_BLOCKCHAINS } from "@/lib/constants";
 import {
   AlertTriangle,
@@ -28,80 +29,176 @@ import {
   CheckCircle2,
   Loader2,
   Info,
+  ExternalLink,
+  Copy,
 } from "lucide-react";
 import Link from "next/link";
+// import toast from "sooner"
+
+interface DepositRequest {
+  id: string;
+  amount: number;
+  currency: string;
+  status: "pending" | "approved" | "rejected" | "completed";
+  transactionHash?: string;
+  createdAt: string;
+  approvedAt?: string;
+}
 
 export default function DepositPage() {
-  const [selectedNetwork, setSelectedNetwork] = useState("");
-  const [nftContractAddress, setNftContractAddress] = useState("");
-  const [tokenId, setTokenId] = useState("");
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [isDepositing, setIsDepositing] = useState(false);
+  const [amount, setAmount] = useState("");
+  const [currency, setCurrency] = useState("ETH");
+  const [transactionHash, setTransactionHash] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [depositComplete, setDepositComplete] = useState(false);
-  const [verificationResult, setVerificationResult] = useState<{
-    valid: boolean;
-    nftName?: string;
-    collection?: string;
-  } | null>(null);
+  const [currentDeposit, setCurrentDeposit] = useState<DepositRequest | null>(
+    null
+  );
+  const [userWallet, setUserWallet] = useState("");
 
-  const handleVerify = async () => {
-    setIsVerifying(true);
-    // Simulate NFT verification
-    setTimeout(() => {
-      setIsVerifying(false);
-      setVerificationResult({
-        valid: true,
-        nftName: "Ethereal Dreams #1234",
-        collection: "Ethereal Dreams Collection",
+  useEffect(() => {
+    fetchUserWallet();
+  }, []);
+
+  const fetchUserWallet = async () => {
+    try {
+      const response = await fetch("/api/user/wallet");
+      const result = await response.json();
+
+      if (result.success && result.data.assignedWallet) {
+        setUserWallet(result.data.assignedWallet);
+      }
+    } catch (error) {
+      console.error("Failed to fetch user wallet:", error);
+    }
+  };
+
+  // Replace the platformWallet constant with:
+  const platformWallet = userWallet || "";
+
+  const handleSubmitDeposit = async () => {
+    if (!amount || parseFloat(amount) <= 0 || !transactionHash) {
+      // toast({
+      //   title: "Error",
+      //   description: "Please fill all required fields",
+      //   variant: "destructive",
+      // });
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const response = await fetch("/api/deposit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          amount: parseFloat(amount),
+          currency,
+          transactionHash,
+        }),
       });
-    }, 2000);
+
+      const data = await response.json();
+
+      if (data.success) {
+        setCurrentDeposit(data.data.depositRequest);
+        setDepositComplete(true);
+        // toast({
+        //   title: "Deposit Submitted",
+        //   description: "Your deposit is pending admin approval",
+        // });
+      } else {
+        // toast({
+        //   title: "Error",
+        //   description: data.error || "Failed to submit deposit",
+        //   variant: "destructive",
+        // });
+      }
+    } catch (error) {
+      // toast({
+      //   title: "Error",
+      //   description: "Failed to submit deposit request",
+      //   variant: "destructive",
+      // });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleDeposit = async () => {
-    setIsDepositing(true);
-    // Simulate deposit process
-    setTimeout(() => {
-      setIsDepositing(false);
-      setDepositComplete(true);
-    }, 3000);
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    // toast({
+    //   title: "Copied!",
+    //   description: "Wallet address copied to clipboard",
+    // });
   };
 
-  if (depositComplete) {
+  if (depositComplete && currentDeposit) {
     return (
       <div className="min-h-screen">
-        <Header />
         <div className="container mx-auto py-8 px-4 pt-24 sm:px-10">
           <div className="max-w-2xl mx-auto">
             <Card>
               <CardContent className="pt-6 text-center">
                 <div className="mb-6">
-                  <div className="mx-auto w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center mb-4">
-                    <CheckCircle2 className="h-8 w-8 text-green-500" />
+                  <div className="mx-auto w-16 h-16 rounded-full bg-blue-500/10 flex items-center justify-center mb-4">
+                    <CheckCircle2 className="h-8 w-8 text-blue-500" />
                   </div>
                   <h2 className="text-2xl font-bold mb-2">
-                    Deposit Successful!
+                    Deposit Request Submitted!
                   </h2>
                   <p className="text-muted-foreground">
-                    Your NFT has been successfully deposited to Vaultorx
+                    Your deposit is pending admin approval
                   </p>
                 </div>
 
-                <div className="bg-muted rounded-lg p-4 mb-6 text-left">
+                <div className="bg-muted rounded-lg p-4 mb-6 text-left space-y-3">
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">NFT</span>
+                      <span className="text-muted-foreground">Amount</span>
                       <span className="font-medium">
-                        {verificationResult?.nftName}
+                        {currentDeposit.amount} {currentDeposit.currency}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Network</span>
-                      <span className="font-medium">{selectedNetwork}</span>
-                    </div>
-                    <div className="flex justify-between">
                       <span className="text-muted-foreground">Status</span>
-                      <Badge>Confirmed</Badge>
+                      <Badge
+                        variant={
+                          currentDeposit.status === "pending"
+                            ? "secondary"
+                            : currentDeposit.status === "approved"
+                            ? "default"
+                            : "destructive"
+                        }
+                      >
+                        {currentDeposit.status.charAt(0).toUpperCase() +
+                          currentDeposit.status.slice(1)}
+                      </Badge>
                     </div>
+                    {currentDeposit.transactionHash && (
+                      <div className="flex justify-between items-center">
+                        <span className="text-muted-foreground">
+                          Transaction
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <code className="text-xs bg-background px-2 py-1 rounded">
+                            {currentDeposit.transactionHash.slice(0, 10)}...
+                            {currentDeposit.transactionHash.slice(-8)}
+                          </code>
+                          <Button variant="ghost" size="sm" asChild>
+                            <a
+                              href={`https://etherscan.io/tx/${currentDeposit.transactionHash}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <ExternalLink className="h-3 w-3" />
+                            </a>
+                          </Button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -117,13 +214,12 @@ export default function DepositPage() {
                     className="flex-1"
                     onClick={() => {
                       setDepositComplete(false);
-                      setVerificationResult(null);
-                      setNftContractAddress("");
-                      setTokenId("");
-                      setSelectedNetwork("");
+                      setCurrentDeposit(null);
+                      setAmount("");
+                      setTransactionHash("");
                     }}
                   >
-                    Deposit Another
+                    New Deposit
                   </Button>
                 </div>
               </CardContent>
@@ -136,8 +232,6 @@ export default function DepositPage() {
 
   return (
     <div className="min-h-screen">
-      <Header />
-
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto">
           <Button variant="ghost" className="mb-6 gap-2" asChild>
@@ -149,166 +243,122 @@ export default function DepositPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Deposit NFT</CardTitle>
+              <CardTitle>Deposit ETH</CardTitle>
               <CardDescription>
-                Transfer your NFT from an external wallet to Vaultorx
+                Send ETH to the platform wallet and request approval
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Network Warning */}
-              <Alert>
-                <AlertTriangle className="h-4 w-4" />
-                <AlertDescription>
-                  <strong>Important:</strong> Ensure you select the correct
-                  network. Sending NFTs from the wrong network will result in
-                  permanent loss of your asset.
-                </AlertDescription>
-              </Alert>
-
-              {/* Network Selection */}
-              <div className="space-y-2">
-                <Label htmlFor="network">
-                  Origin Network <span className="text-destructive">*</span>
-                </Label>
-                <Select
-                  value={selectedNetwork}
-                  onValueChange={setSelectedNetwork}
-                >
-                  <SelectTrigger id="network">
-                    <SelectValue placeholder="Select the network your NFT is on" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {SUPPORTED_BLOCKCHAINS.map((blockchain) => (
-                      <SelectItem key={blockchain.id} value={blockchain.id}>
-                        {blockchain.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              {/* Platform Wallet Address */}
+              <div className="space-y-3">
+                <Label>Platform Wallet Address</Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    value={platformWallet}
+                    readOnly
+                    className="font-mono"
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => copyToClipboard(platformWallet)}
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
                 <p className="text-xs text-muted-foreground">
-                  Select the blockchain network where your NFT currently exists
+                  Send ETH only to this address. Sending other tokens may result
+                  in permanent loss.
                 </p>
               </div>
 
-              {/* Contract Address */}
+              {/* Deposit Instructions */}
+              <Alert>
+                <Info className="h-4 w-4" />
+                <AlertDescription>
+                  <div className="space-y-2">
+                    <p className="font-medium">Deposit Instructions:</p>
+                    <ol className="list-decimal list-inside space-y-1 text-sm">
+                      <li>Send ETH to the platform wallet address above</li>
+                      <li>Wait for transaction confirmation</li>
+                      <li>Fill out the form below with transaction details</li>
+                      <li>Wait for admin approval (usually within 24 hours)</li>
+                      <li>
+                        Your wallet balance will be updated after approval
+                      </li>
+                    </ol>
+                  </div>
+                </AlertDescription>
+              </Alert>
+
+              {/* Amount Input */}
               <div className="space-y-2">
-                <Label htmlFor="contract">
-                  NFT Contract Address{" "}
-                  <span className="text-destructive">*</span>
+                <Label htmlFor="amount">
+                  Amount <span className="text-destructive">*</span>
+                </Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="amount"
+                    type="number"
+                    step="0.000001"
+                    placeholder="0.00"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                  />
+                  <Select value={currency} onValueChange={setCurrency}>
+                    <SelectTrigger className="w-24">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ETH">ETH</SelectItem>
+                      <SelectItem value="USDC">USDC</SelectItem>
+                      <SelectItem value="USDT">USDT</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {/* Transaction Hash */}
+              <div className="space-y-2">
+                <Label htmlFor="transactionHash">
+                  Transaction Hash <span className="text-destructive">*</span>
                 </Label>
                 <Input
-                  id="contract"
+                  id="transactionHash"
                   placeholder="0x..."
-                  value={nftContractAddress}
-                  onChange={(e) => setNftContractAddress(e.target.value)}
+                  value={transactionHash}
+                  onChange={(e) => setTransactionHash(e.target.value)}
                 />
+                <p className="text-xs text-muted-foreground">
+                  Enter the transaction hash from your wallet after sending ETH
+                </p>
               </div>
 
-              {/* Token ID */}
-              <div className="space-y-2">
-                <Label htmlFor="tokenId">
-                  Token ID <span className="text-destructive">*</span>
-                </Label>
-                <Input
-                  id="tokenId"
-                  placeholder="e.g. 1234"
-                  value={tokenId}
-                  onChange={(e) => setTokenId(e.target.value)}
-                />
-              </div>
+              {/* Submit Button */}
+              <Button
+                className="w-full"
+                size="lg"
+                onClick={handleSubmitDeposit}
+                disabled={isSubmitting || !amount || !transactionHash}
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Submitting Request...
+                  </>
+                ) : (
+                  "Submit Deposit Request"
+                )}
+              </Button>
 
-              {/* Verify Button */}
-              {!verificationResult && (
-                <Button
-                  className="w-full"
-                  onClick={handleVerify}
-                  disabled={
-                    !selectedNetwork ||
-                    !nftContractAddress ||
-                    !tokenId ||
-                    isVerifying
-                  }
-                >
-                  {isVerifying ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Verifying NFT...
-                    </>
-                  ) : (
-                    "Verify NFT"
-                  )}
-                </Button>
-              )}
-
-              {/* Verification Result */}
-              {verificationResult && (
-                <>
-                  {verificationResult.valid ? (
-                    <Alert>
-                      <CheckCircle2 className="h-4 w-4 text-green-500" />
-                      <AlertDescription>
-                        <div className="space-y-1">
-                          <p className="font-medium">
-                            NFT Verified Successfully
-                          </p>
-                          <p className="text-sm">
-                            {verificationResult.nftName} from{" "}
-                            {verificationResult.collection}
-                          </p>
-                        </div>
-                      </AlertDescription>
-                    </Alert>
-                  ) : (
-                    <Alert variant="destructive">
-                      <AlertTriangle className="h-4 w-4" />
-                      <AlertDescription>
-                        Unable to verify NFT. Please check the contract address
-                        and token ID.
-                      </AlertDescription>
-                    </Alert>
-                  )}
-
-                  {/* Deposit Instructions */}
-                  {verificationResult.valid && (
-                    <>
-                      <div className="bg-muted rounded-lg p-4 space-y-3">
-                        <div className="flex items-start gap-2">
-                          <Info className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-                          <div className="text-sm space-y-2">
-                            <p className="font-medium">Deposit Instructions:</p>
-                            <ol className="list-decimal list-inside space-y-1 text-muted-foreground">
-                              <li>Click "Initiate Deposit" below</li>
-                              <li>Approve the transaction in your wallet</li>
-                              <li>
-                                Wait for blockchain confirmation (1-2 minutes)
-                              </li>
-                              <li>
-                                Your NFT will appear in your Vaultorx dashboard
-                              </li>
-                            </ol>
-                          </div>
-                        </div>
-                      </div>
-
-                      <Button
-                        className="w-full"
-                        size="lg"
-                        onClick={handleDeposit}
-                        disabled={isDepositing}
-                      >
-                        {isDepositing ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Processing Deposit...
-                          </>
-                        ) : (
-                          "Initiate Deposit"
-                        )}
-                      </Button>
-                    </>
-                  )}
-                </>
-              )}
+              {/* Warning */}
+              <Alert variant="destructive">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertDescription>
+                  <strong>Warning:</strong> Only send ETH from networks we
+                  support. Double-check the wallet address before sending.
+                </AlertDescription>
+              </Alert>
             </CardContent>
           </Card>
         </div>

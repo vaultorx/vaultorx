@@ -44,7 +44,7 @@ async function seedProduction() {
       name: process.env.SUPERADMIN_NAME || "Super Administrator",
       password: hashedPassword,
       role: UserRole.SUPERADMIN,
-      emailVerified: new Date(),
+      emailVerified: true,
     },
   });
 

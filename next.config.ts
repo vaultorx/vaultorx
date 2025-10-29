@@ -7,8 +7,44 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "avatars.githubusercontent.com",
       },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+      },
+      {
+        protocol: "https",
+        hostname: "**.cloudinary.com",
+      },
+      {
+        protocol: "https",
+        hostname: "via.placeholder.com",
+      },
+      {
+        protocol: "https",
+        hostname: "picsum.photos",
+      },
+      {
+        protocol: "https",
+        hostname: "**.amazonaws.com",
+      },
     ],
+    domains: ["res.cloudinary.com", "via.placeholder.com", "picsum.photos"],
   },
+
+  // Fix: Use the new configuration format
+  serverExternalPackages: [
+    "@prisma/client",
+    "bcryptjs",
+    "adminjs",
+    "@adminjs/prisma",
+    "@adminjs/express",
+    "esbuild",
+  ],
+
+  // Remove the experimental block entirely since it's deprecated
+  // experimental: {
+  //   serverComponentsExternalPackages: [...],
+  // },
 
   webpack: (config, { isServer, dev }) => {
     // Client-side exclusions
@@ -18,32 +54,27 @@ const nextConfig: NextConfig = {
         fs: false,
         net: false,
         tls: false,
+        crypto: false,
       };
     }
 
-    // Exclude openid-client and other problematic packages from middleware
+    // Exclude problematic packages from middleware
     if (isServer && !dev) {
-      config.externals.push({
-        "openid-client": "commonjs openid-client",
-      });
+      config.externals.push(
+        { "openid-client": "commonjs openid-client" },
+        { bcryptjs: "commonjs bcryptjs" }
+      );
     }
 
     return config;
   },
 
-  serverExternalPackages: [],
-
-  experimental: {
-    serverComponentsExternalPackages: [
-      "@prisma/client",
-      "bcryptjs",
-      "adminjs",
-      "@adminjs/prisma",
-      "@adminjs/express",
-      "@prisma/client",
-      ".prisma/client",
-      "esbuild",
-    ],
+  // Add compiler options to handle type checking
+  typescript: {
+    ignoreBuildErrors: false,
+  },
+  eslint: {
+    ignoreDuringBuilds: false,
   },
 };
 

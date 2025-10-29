@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { amount, currency = "ETH" } = await request.json();
+    const { amount, currency = "ETH", transactionHash } = await request.json();
 
     if (!amount || amount <= 0) {
       return NextResponse.json(
@@ -32,42 +32,63 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Update user wallet balance
-    const updatedUser = await prisma.user.update({
-      where: { id: user.id },
+    if (!transactionHash) {
+      return NextResponse.json(
+        { error: "Transaction hash is required", success: false },
+        { status: 400 }
+      );
+    }
+
+    // Check if transaction hash already exists
+    const existingDeposit = await prisma.depositRequest.findUnique({
+      where: { transactionHash },
+    });
+
+    if (existingDeposit) {
+      return NextResponse.json(
+        { error: "Transaction hash already exists", success: false },
+        { status: 400 }
+      );
+    }
+
+    // Create deposit request (pending admin approval)
+    const depositRequest = await prisma.depositRequest.create({
       data: {
-        walletBalance: { increment: amount },
+        userId: user.id,
+        amount,
+        currency,
+        transactionHash,
+        status: "pending",
       },
     });
 
-    // Create deposit transaction
+    // Create pending transaction record
     const transaction = await prisma.transaction.create({
       data: {
-        transactionHash: `deposit_${Date.now()}_${user.id}`,
-        nftItemId: "deposit_only", // Special ID for deposit transactions
+        transactionHash: transactionHash,
+        nftItemId: "deposit_only",
         toUserId: user.id,
         transactionType: "deposit",
         price: amount,
         currency,
-        status: "completed",
-        nftName: "Crypto Deposit",
+        status: "pending",
+        nftName: `${currency} Deposit`,
         to: user.username || user.email,
-        confirmedAt: new Date(),
       },
     });
 
     return NextResponse.json({
       data: {
-        newBalance: updatedUser.walletBalance,
+        depositRequest,
         transaction,
       },
-      message: "Deposit successful",
+      message: "Deposit request submitted for approval",
       success: true,
     });
   } catch (error) {
     console.error("Deposit error:", error);
     return NextResponse.json(
-      { error: "Failed to process deposit", success: false },
+      { error: "Failed to process deposit request", success: false },
       { status: 500 }
     );
   }

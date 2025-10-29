@@ -5,7 +5,7 @@ import { Move3D, Rocket, Sparkles, Zap } from "lucide-react";
 
 export default function Loading() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-purple-950 flex items-center justify-center relative overflow-hidden">
+    <div className="min-h-screen bg-linear-to-br from-slate-950 via-blue-950 to-purple-950 flex items-center justify-center relative overflow-hidden">
       {/* Animated Background */}
       <div className="absolute inset-0">
         {/* Floating Particles */}
@@ -60,25 +60,12 @@ export default function Loading() {
           transition={{ type: "spring", stiffness: 200, damping: 15 }}
         >
           <div className="relative">
-            <motion.div
-              className="h-24 w-24 rounded-2xl bg-gradient-to-br from-blue-500 via-purple-600 to-cyan-500 flex items-center justify-center mx-auto shadow-2xl shadow-blue-500/25"
-              animate={{
-                rotate: 360,
-                scale: [1, 1.1, 1],
-              }}
-              transition={{
-                rotate: { duration: 4, repeat: Infinity, ease: "linear" },
-                scale: { duration: 2, repeat: Infinity, ease: "easeInOut" },
-              }}
-            >
-              <Rocket className="h-12 w-12 text-white" />
-            </motion.div>
 
             {/* Orbiting Elements */}
             {[0, 1, 2].map((i) => (
               <motion.div
                 key={i}
-                className="absolute h-6 w-6 rounded-full bg-gradient-to-r from-cyan-400 to-blue-400 flex items-center justify-center shadow-lg shadow-cyan-500/50"
+                className="absolute h-6 w-6 rounded-full bg-linear-to-r from-cyan-400 to-blue-400 flex items-center justify-center shadow-lg shadow-cyan-500/50"
                 style={{
                   top: "50%",
                   left: "50%",
@@ -109,7 +96,7 @@ export default function Loading() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
         >
-          <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-white via-blue-200 to-cyan-200 bg-clip-text text-transparent mb-4">
+          <h1 className="text-4xl md:text-6xl font-bold bg-linear-to-r from-white via-blue-200 to-cyan-200 bg-clip-text text-transparent mb-4">
             Vaultorx
           </h1>
           <p className="text-slate-400 text-lg md:text-xl mb-8 max-w-md mx-auto">
@@ -121,7 +108,7 @@ export default function Loading() {
         <div className="max-w-md mx-auto">
           <div className="h-2 bg-slate-800 rounded-full overflow-hidden mb-4">
             <motion.div
-              className="h-full bg-gradient-to-r from-blue-500 to-purple-600 rounded-full"
+              className="h-full bg-linear-to-r from-blue-500 to-purple-600 rounded-full"
               initial={{ width: "0%" }}
               animate={{ width: "100%" }}
               transition={{ duration: 2, ease: "easeInOut" }}

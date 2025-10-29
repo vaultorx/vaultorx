@@ -12,11 +12,44 @@ import {
   quickActions,
   nftItems,
 } from "@/lib/mocks";
+import { useDashboard } from "@/hooks/use-dashboard"
+import { useNFTs } from "@/hooks/use-nfts"
 
 export default function DashboardPage() {
+
+  const {
+    stats,
+    recentActivities,
+    quickActions,
+    loading: dashboardLoading,
+    error: dashboardError,
+  } = useDashboard();
+  const {
+    nfts: userNFTs,
+    loading: nftsLoading,
+    error: nftsError,
+  } = useNFTs({ limit: 50 });
+
   // Filter owned and listed NFTs
-  const ownedNFTs = nftItems.filter((nft) => !nft.isListed);
-  const listedNFTs = nftItems.filter((nft) => nft.isListed);
+  const ownedNFTs = userNFTs.filter((nft) => !nft.isListed);
+  const listedNFTs = userNFTs.filter((nft) => nft.isListed);
+
+   if (dashboardError || nftsError) {
+     return (
+       <div className="min-h-screen">
+         <div className="container mx-auto px-4 py-8">
+           <div className="text-center py-12">
+             <h3 className="text-lg font-semibold mb-2">
+               Failed to load dashboard data
+             </h3>
+             <p className="text-muted-foreground">
+               {dashboardError || nftsError}
+             </p>
+           </div>
+         </div>
+       </div>
+     );
+   }
 
   return (
     <div className="min-h-screen">
@@ -30,16 +63,26 @@ export default function DashboardPage() {
 
         <div className="space-y-6">
           {/* Stats */}
-          <DashboardStats stats={dashboardStats} />
+          <DashboardStats stats={stats} loading={dashboardLoading} />
 
           {/* Quick Actions */}
-          <DashboardQuickActions actions={quickActions} />
+          <DashboardQuickActions
+            actions={quickActions}
+            loading={dashboardLoading}
+          />
 
           {/* Recent Activity */}
-          <DashboardRecentActivity activities={recentActivities} />
+          <DashboardRecentActivity
+            activities={recentActivities}
+            loading={dashboardLoading}
+          />
 
           {/* NFT Grid */}
-          <DashboardNFTGrid ownedNFTs={ownedNFTs} listedNFTs={listedNFTs} />
+          <DashboardNFTGrid
+            ownedNFTs={ownedNFTs}
+            listedNFTs={listedNFTs}
+            loading={nftsLoading}
+          />
         </div>
       </div>
     </div>

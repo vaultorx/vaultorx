@@ -14,7 +14,8 @@
     "db:reset": "prisma migrate reset && npm run db:seed",
     "db:studio": "prisma studio",
     "db:generate": "prisma generate",
-    "db:migrate": "prisma migrate dev"
+    "db:migrate": "prisma migrate dev",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@adminjs/express": "^6.1.1",
@@ -62,6 +63,7 @@
     "bcryptjs": "^3.0.2",
     "class-variance-authority": "^0.7.1",
     "cloudinary": "^2.8.0",
+    "cloudinary-react": "^1.8.1",
     "clsx": "^2.1.1",
     "cmdk": "1.0.4",
     "connect-pg-simple": "^10.0.0",

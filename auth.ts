@@ -1,9 +1,10 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import prisma from "@/lib/prisma";
-import bcrypt from "bcryptjs";
+import { compare } from "bcryptjs";
 import { LoginSchema } from "./lib/validations/auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
+import { WalletService } from "./lib/services/wallet-service";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
@@ -52,7 +53,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             return null;
           }
 
-          const passwordMatch = await bcrypt.compare(password, user.password);
+          const passwordMatch = await compare(password, user.password);
           console.log("🔐 Password match:", passwordMatch);
 
           if (!passwordMatch) {
@@ -77,6 +78,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async jwt({ token, user }: any) {
       if (user) {
         token.role = user.role;
+        // Fetch and include wallet info
+        const walletInfo = await WalletService.getUserWallet(user.id);
+        token.assignedWallet = walletInfo?.assignedWallet;
       }
       return token;
     },
@@ -84,6 +88,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (token) {
         session.user.id = token.sub!;
         session.user.role = token.role as string;
+         session.user.assignedWallet = token.assignedWallet as string;
       }
       return session;
     },

@@ -5,8 +5,6 @@ import { Header } from "@/components/header";
 export function DashboardSkeleton() {
   return (
     <div className="min-h-screen">
-      <Header />
-
       <div className="container mx-auto px-4 py-8">
         {/* Header Skeleton */}
         <div className="mb-8">
