@@ -21,7 +21,7 @@ export function CollectionTabs({
 
   return (
     <motion.div
-      className="flex gap-1 p-1 bg-slate-800/50 rounded-xl border border-slate-700/50 mb-8"
+      className="flex gap-1 p-1 bg-gray-100 rounded-xl border border-gray-200 mb-8"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: 0.3 }}
@@ -34,15 +34,15 @@ export function CollectionTabs({
             variant="ghost"
             className={`flex-1 gap-2 ${
               activeTab === tab.id
-                ? "bg-slate-700 text-white shadow-lg"
-                : "text-slate-400 hover:text-white"
+                ? "bg-white text-gray-900 shadow-lg"
+                : "text-gray-600 hover:text-gray-900"
             }`}
             onClick={() => setActiveTab(tab.id)}
           >
             <Icon className="h-4 w-4" />
             {tab.label}
             {tab.count !== null && (
-              <span className="px-2 py-1 text-xs bg-slate-600 rounded-full">
+              <span className="px-2 py-1 text-xs bg-gray-200 rounded-full">
                 {tab.count}
               </span>
             )}

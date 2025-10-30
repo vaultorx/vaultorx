@@ -59,7 +59,7 @@ export function CollectionFilters({
           <Button
             variant="outline"
             size="sm"
-            className="border-slate-700 text-slate-300 hover:bg-slate-800 gap-2"
+            className="border-gray-300 text-gray-700 hover:bg-gray-50 gap-2"
           >
             <Filter className="h-4 w-4" />
             {category === "all"
@@ -69,15 +69,15 @@ export function CollectionFilters({
         </DropdownMenuTrigger>
         <DropdownMenuContent
           align="end"
-          className="w-48 bg-slate-800 border-slate-700"
+          className="w-48 bg-white border-gray-200"
         >
           {categoryOptions.map((option) => (
             <DropdownMenuItem
               key={option.value}
               className={`flex items-center justify-between ${
                 category === option.value
-                  ? "bg-slate-700 text-white"
-                  : "text-slate-300"
+                  ? "bg-blue-50 text-blue-700"
+                  : "text-gray-700"
               }`}
               onClick={() => {
                 setCategory(option.value);
@@ -97,7 +97,7 @@ export function CollectionFilters({
           <Button
             variant="outline"
             size="sm"
-            className="border-slate-700 text-slate-300 hover:bg-slate-800 gap-2"
+            className="border-gray-300 text-gray-700 hover:bg-gray-50 gap-2"
           >
             <SortAsc className="h-4 w-4" />
             {currentSortLabel}
@@ -105,7 +105,7 @@ export function CollectionFilters({
         </DropdownMenuTrigger>
         <DropdownMenuContent
           align="end"
-          className="w-48 bg-slate-800 border-slate-700"
+          className="w-48 bg-white border-gray-200"
         >
           {sortOptions.map((option) => {
             const Icon = option.icon;
@@ -114,8 +114,8 @@ export function CollectionFilters({
                 key={option.value}
                 className={`flex items-center gap-2 ${
                   sortBy === option.value
-                    ? "bg-slate-700 text-white"
-                    : "text-slate-300"
+                    ? "bg-blue-50 text-blue-700"
+                    : "text-gray-700"
                 }`}
                 onClick={() => setSortBy(option.value)}
               >
@@ -136,8 +136,8 @@ export function CollectionFilters({
         size="sm"
         className={`gap-2 ${
           verifiedOnly
-            ? "bg-blue-500 hover:bg-blue-600"
-            : "border-slate-700 text-slate-300 hover:bg-slate-800"
+            ? "bg-blue-600 hover:bg-blue-700"
+            : "border-gray-300 text-gray-700 hover:bg-gray-50"
         }`}
         onClick={() => setVerifiedOnly(!verifiedOnly)}
       >

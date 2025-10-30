@@ -9,7 +9,7 @@ import Link from "next/link";
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="min-h-screen bg-white">
       <Header />
 
       <div className="pt-24 px-4 sm:px-10 min-h-screen flex items-center justify-center">
@@ -26,20 +26,20 @@ export default function NotFound() {
             animate={{ scale: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <div className="w-48 h-48 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto">
+            <div className="w-48 h-48 bg-blue-100 rounded-full flex items-center justify-center mx-auto">
               <div className="text-6xl">🔍</div>
             </div>
             <div className="absolute -top-4 -right-4">
-              <div className="text-8xl font-bold text-purple-500/30">404</div>
+              <div className="text-8xl font-bold text-blue-200">404</div>
             </div>
           </motion.div>
 
           {/* Message */}
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             Page not found
           </h1>
 
-          <p className="text-lg text-slate-400 mb-8 leading-relaxed">
+          <p className="text-lg text-gray-600 mb-8 leading-relaxed">
             The page you're looking for doesn't exist or has been moved. It
             might have been deleted, or you may have entered the wrong URL.
           </p>
@@ -47,7 +47,7 @@ export default function NotFound() {
           {/* Suggested Actions */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
             <Link href="/">
-              <Button className="gap-2 bg-blue-500 hover:bg-blue-600" size="lg">
+              <Button className="gap-2 bg-blue-600 hover:bg-blue-700" size="lg">
                 <Home className="h-4 w-4" />
                 Go Home
               </Button>
@@ -56,7 +56,7 @@ export default function NotFound() {
             <Link href="/collections">
               <Button
                 variant="outline"
-                className="gap-2 border-slate-600 text-slate-300 hover:bg-slate-800 hover:text-white"
+                className="gap-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-gray-900"
                 size="lg"
               >
                 <Search className="h-4 w-4" />
@@ -66,7 +66,7 @@ export default function NotFound() {
 
             <Button
               variant="outline"
-              className="gap-2 border-slate-600 text-slate-300 hover:bg-slate-800 hover:text-white"
+              className="gap-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-gray-900"
               size="lg"
               onClick={() => window.history.back()}
             >
@@ -77,20 +77,20 @@ export default function NotFound() {
 
           {/* Search Suggestions */}
           <motion.div
-            className="p-6 bg-slate-800/30 rounded-xl border border-slate-700/50 text-left"
+            className="p-6 bg-gray-50 rounded-xl border border-gray-200 text-left"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.8 }}
           >
-            <h3 className="text-lg font-semibold text-white mb-3">
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">
               Looking for something specific?
             </h3>
-            <ul className="text-slate-400 space-y-2">
+            <ul className="text-gray-600 space-y-2">
               <li>
                 • Check out our{" "}
                 <Link
                   href="/collections"
-                  className="text-blue-400 hover:text-blue-300"
+                  className="text-blue-600 hover:text-blue-500"
                 >
                   collections
                 </Link>
@@ -99,7 +99,7 @@ export default function NotFound() {
                 • Browse the{" "}
                 <Link
                   href="/marketplace"
-                  className="text-blue-400 hover:text-blue-300"
+                  className="text-blue-600 hover:text-blue-500"
                 >
                   marketplace
                 </Link>
@@ -108,7 +108,7 @@ export default function NotFound() {
                 • Explore trending{" "}
                 <Link
                   href="/categories"
-                  className="text-blue-400 hover:text-blue-300"
+                  className="text-blue-600 hover:text-blue-500"
                 >
                   categories
                 </Link>
@@ -117,7 +117,7 @@ export default function NotFound() {
                 • Visit our{" "}
                 <Link
                   href="/help"
-                  className="text-blue-400 hover:text-blue-300"
+                  className="text-blue-600 hover:text-blue-500"
                 >
                   help center
                 </Link>

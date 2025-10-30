@@ -69,13 +69,13 @@ export function CollectionActivity({ collection }: CollectionActivityProps) {
   const getActivityIcon = (type: string) => {
     switch (type) {
       case "sale":
-        return <ArrowUpRight className="h-4 w-4 text-green-400" />;
+        return <ArrowUpRight className="h-4 w-4 text-green-500" />;
       case "list":
-        return <Zap className="h-4 w-4 text-blue-400" />;
+        return <Zap className="h-4 w-4 text-blue-500" />;
       case "mint":
-        return <Sparkles className="h-4 w-4 text-purple-400" />;
+        return <Sparkles className="h-4 w-4 text-purple-500" />;
       case "transfer":
-        return <ArrowDownLeft className="h-4 w-4 text-amber-400" />;
+        return <ArrowDownLeft className="h-4 w-4 text-amber-500" />;
       default:
         return <Zap className="h-4 w-4" />;
     }
@@ -84,15 +84,15 @@ export function CollectionActivity({ collection }: CollectionActivityProps) {
   const getActivityColor = (type: string) => {
     switch (type) {
       case "sale":
-        return "text-green-400";
+        return "text-green-600";
       case "list":
-        return "text-blue-400";
+        return "text-blue-600";
       case "mint":
-        return "text-purple-400";
+        return "text-purple-600";
       case "transfer":
-        return "text-amber-400";
+        return "text-amber-600";
       default:
-        return "text-slate-400";
+        return "text-gray-600";
     }
   };
 
@@ -118,14 +118,14 @@ export function CollectionActivity({ collection }: CollectionActivityProps) {
     return (
       <div className="space-y-4">
         {Array.from({ length: 5 }).map((_, i) => (
-          <Card key={i} className="p-4 bg-slate-800/50 border-slate-700/50">
+          <Card key={i} className="p-4 bg-gray-50 border-gray-200">
             <div className="flex items-center gap-4">
-              <div className="w-8 h-8 bg-slate-700 rounded-lg animate-pulse" />
+              <div className="w-8 h-8 bg-gray-200 rounded-lg animate-pulse" />
               <div className="flex-1 space-y-2">
-                <div className="h-4 bg-slate-700 rounded w-1/3 animate-pulse" />
-                <div className="h-3 bg-slate-700 rounded w-1/2 animate-pulse" />
+                <div className="h-4 bg-gray-200 rounded w-1/3 animate-pulse" />
+                <div className="h-3 bg-gray-200 rounded w-1/2 animate-pulse" />
               </div>
-              <div className="w-16 h-4 bg-slate-700 rounded animate-pulse" />
+              <div className="w-16 h-4 bg-gray-200 rounded animate-pulse" />
             </div>
           </Card>
         ))}
@@ -137,13 +137,13 @@ export function CollectionActivity({ collection }: CollectionActivityProps) {
     return (
       <div className="text-center py-16">
         <div className="text-6xl mb-4">⚠️</div>
-        <h3 className="text-xl font-semibold text-white mb-2">
+        <h3 className="text-xl font-semibold text-gray-900 mb-2">
           Failed to load activity
         </h3>
-        <p className="text-slate-400 mb-4">{error}</p>
+        <p className="text-gray-600 mb-4">{error}</p>
         <button
           onClick={fetchActivities}
-          className="text-blue-400 hover:text-blue-300 transition-colors"
+          className="text-blue-600 hover:text-blue-700 transition-colors"
         >
           Try Again
         </button>
@@ -160,10 +160,10 @@ export function CollectionActivity({ collection }: CollectionActivityProps) {
       {activities.length === 0 ? (
         <div className="text-center py-16">
           <div className="text-6xl mb-4">📊</div>
-          <h3 className="text-xl font-semibold text-white mb-2">
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">
             No activity yet
           </h3>
-          <p className="text-slate-400">
+          <p className="text-gray-600">
             Activity for this collection will appear here.
           </p>
         </div>
@@ -175,10 +175,10 @@ export function CollectionActivity({ collection }: CollectionActivityProps) {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: index * 0.1 }}
           >
-            <Card className="p-4 bg-slate-800/50 backdrop-blur-xl border-slate-700/50 hover:border-slate-600 transition-all duration-300">
+            <Card className="p-4 bg-white border-gray-200 hover:border-gray-300 transition-all duration-300">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="p-2 rounded-lg bg-slate-700/50">
+                  <div className="p-2 rounded-lg bg-gray-100">
                     {getActivityIcon(activity.type)}
                   </div>
 
@@ -196,7 +196,7 @@ export function CollectionActivity({ collection }: CollectionActivityProps) {
                       </Badge>
                     </div>
 
-                    <div className="text-sm text-slate-400">
+                    <div className="text-sm text-gray-600">
                       {activity.from && (
                         <span>From {formatAddress(activity.from)}</span>
                       )}
@@ -204,7 +204,7 @@ export function CollectionActivity({ collection }: CollectionActivityProps) {
                         <span> → To {formatAddress(activity.to)}</span>
                       )}
                       {activity.price && (
-                        <span className="text-white ml-2">
+                        <span className="text-gray-900 ml-2">
                           • {activity.price} ETH
                         </span>
                       )}
@@ -213,11 +213,11 @@ export function CollectionActivity({ collection }: CollectionActivityProps) {
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <span className="text-sm text-slate-400">
+                  <span className="text-sm text-gray-500">
                     {formatTime(activity.timestamp)}
                   </span>
                   <button
-                    className="text-slate-400 hover:text-white transition-colors"
+                    className="text-gray-400 hover:text-gray-600 transition-colors"
                     onClick={() =>
                       window.open(
                         `https://etherscan.io/tx/${activity.txHash}`,

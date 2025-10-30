@@ -3,7 +3,6 @@ import { cloudinary } from "@/lib/cloudinary";
 import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
 
-
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -13,22 +12,16 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get("search");
     const sortBy = searchParams.get("sortBy") || "recent";
     const sortOrder = searchParams.get("sortOrder") || "desc";
-
-    console.log("🔍 API Request params:", {
-      page,
-      limit,
-      category,
-      search,
-      sortBy,
-      sortOrder,
-    });
+    const listedOnly = searchParams.get("listed") === "true";
+    const minPrice = searchParams.get("minPrice");
+    const maxPrice = searchParams.get("maxPrice");
 
     const skip = (page - 1) * limit;
 
     // Build where clause
     const where: any = {};
 
-    if (category) {
+    if (category && category !== 'all') {
       where.category = category;
     }
 
@@ -40,18 +33,27 @@ export async function GET(request: NextRequest) {
       ];
     }
 
-    console.log("📋 Prisma where clause:", JSON.stringify(where, null, 2));
+    if (listedOnly) {
+      where.isListed = true;
+    }
+
+    if (minPrice || maxPrice) {
+      where.listPrice = {};
+      if (minPrice) where.listPrice.gte = parseFloat(minPrice);
+      if (maxPrice) where.listPrice.lte = parseFloat(maxPrice);
+    }
 
     // Map frontend sort options to actual database fields
     const getOrderBy = () => {
-      const order = sortOrder === "asc" ? "asc" : "desc";
+      const order: any = sortOrder === "asc" ? "asc" : "desc";
 
       switch (sortBy) {
         case "recent":
           return { createdAt: order };
         case "price-low":
+          return { listPrice: "asc" };
         case "price-high":
-          return { listPrice: order };
+          return { listPrice: "desc" };
         case "most-liked":
           return { likes: order };
         case "most-viewed":
@@ -63,32 +65,32 @@ export async function GET(request: NextRequest) {
       }
     };
 
-    const orderBy = getOrderBy();
-    console.log("📊 Order by:", orderBy);
+    const orderBy: any = getOrderBy();
 
     const [nfts, total] = await Promise.all([
       prisma.nFTItem.findMany({
         where,
         include: {
-          collection: true,
+          collection: {
+            select: {
+              id: true,
+              name: true,
+              verified: true,
+            },
+          },
           owner: {
             select: {
               id: true,
               username: true,
-              email: true,
             },
           },
         },
-        orderBy: {createdAt:"desc"},
+        orderBy,
         skip,
         take: limit,
       }),
       prisma.nFTItem.count({ where }),
     ]);
-
-    console.log(
-      `📊 Database results: ${nfts.length} NFTs out of ${total} total`
-    );
 
     return NextResponse.json({
       data: nfts,
@@ -101,7 +103,7 @@ export async function GET(request: NextRequest) {
       success: true,
     });
   } catch (error) {
-    console.error("💥 Failed to fetch NFTs:", error);
+    console.error("Failed to fetch NFTs:", error);
     return NextResponse.json(
       { error: "Failed to fetch NFTs", success: false },
       { status: 500 }

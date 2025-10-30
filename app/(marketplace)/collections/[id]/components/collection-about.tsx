@@ -53,17 +53,19 @@ export function CollectionAbout({ collection }: CollectionAboutProps) {
     >
       {/* Collection Description */}
       <div className="lg:col-span-2 space-y-6">
-        <Card className="p-6 bg-slate-800/50 backdrop-blur-xl border-slate-700/50">
-          <h3 className="text-xl font-semibold text-white mb-4">Description</h3>
-          <p className="text-slate-300 leading-relaxed">
+        <Card className="p-6 bg-white border-gray-200">
+          <h3 className="text-xl font-semibold text-gray-900 mb-4">
+            Description
+          </h3>
+          <p className="text-gray-600 leading-relaxed">
             {collection.description ||
               "No description available for this collection."}
           </p>
         </Card>
 
         {/* Contract Info */}
-        <Card className="p-6 bg-slate-800/50 backdrop-blur-xl border-slate-700/50">
-          <h3 className="text-xl font-semibold text-white mb-4">
+        <Card className="p-6 bg-white border-gray-200">
+          <h3 className="text-xl font-semibold text-gray-900 mb-4">
             Contract Details
           </h3>
           <div className="space-y-3">
@@ -72,18 +74,18 @@ export function CollectionAbout({ collection }: CollectionAboutProps) {
               return (
                 <div
                   key={detail.label}
-                  className="flex items-center justify-between py-2 border-b border-slate-700/50 last:border-b-0"
+                  className="flex items-center justify-between py-2 border-b border-gray-200 last:border-b-0"
                 >
-                  <div className="flex items-center gap-3 text-slate-400">
+                  <div className="flex items-center gap-3 text-gray-600">
                     <Icon className="h-4 w-4" />
                     <span>{detail.label}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-white font-mono text-sm">
+                    <span className="text-gray-900 font-mono text-sm">
                       {detail.value}
                     </span>
                     {detail.copyable && (
-                      <button className="text-slate-400 hover:text-white transition-colors">
+                      <button className="text-gray-400 hover:text-gray-600 transition-colors">
                         <Link2 className="h-3 w-3" />
                       </button>
                     )}
@@ -98,34 +100,34 @@ export function CollectionAbout({ collection }: CollectionAboutProps) {
       {/* Stats & Links */}
       <div className="space-y-6">
         {/* Quick Stats */}
-        <Card className="p-6 bg-slate-800/50 backdrop-blur-xl border-slate-700/50">
-          <h3 className="text-xl font-semibold text-white mb-4">
+        <Card className="p-6 bg-white border-gray-200">
+          <h3 className="text-xl font-semibold text-gray-900 mb-4">
             Collection Stats
           </h3>
           <div className="space-y-3">
             <div className="flex justify-between items-center">
-              <span className="text-slate-400">Floor Price</span>
-              <span className="text-white font-semibold">
+              <span className="text-gray-600">Floor Price</span>
+              <span className="text-gray-900 font-semibold">
                 {collection.floorPrice
                   ? `${collection.floorPrice || 0} ETH`
                   : "—"}
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-slate-400">Total Volume</span>
-              <span className="text-white font-semibold">
+              <span className="text-gray-600">Total Volume</span>
+              <span className="text-gray-900 font-semibold">
                 {collection?.totalVolume?.toFixed(1) || 0} ETH
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-slate-400">Listed Items</span>
-              <span className="text-white font-semibold">
+              <span className="text-gray-600">Listed Items</span>
+              <span className="text-gray-900 font-semibold">
                 {collection?.listedItems || 0} / {collection?.totalItems || 0}
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-slate-400">Listed Percentage</span>
-              <span className="text-green-400 font-semibold">
+              <span className="text-gray-600">Listed Percentage</span>
+              <span className="text-green-600 font-semibold">
                 {Math.round(
                   ((collection.listedItems || 0) /
                     Math.max(collection?.totalItems || 0, 1)) *
@@ -138,18 +140,18 @@ export function CollectionAbout({ collection }: CollectionAboutProps) {
         </Card>
 
         {/* Links */}
-        <Card className="p-6 bg-slate-800/50 backdrop-blur-xl border-slate-700/50">
-          <h3 className="text-xl font-semibold text-white mb-4">Links</h3>
+        <Card className="p-6 bg-white border-gray-200">
+          <h3 className="text-xl font-semibold text-gray-900 mb-4">Links</h3>
           <div className="space-y-2">
             {collection.ipfsMetadataUri && (
-              <button className="w-full text-left p-3 rounded-lg bg-slate-700/50 hover:bg-slate-600/50 transition-colors text-slate-300 hover:text-white">
+              <button className="w-full text-left p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors text-gray-600 hover:text-gray-900">
                 <div className="flex items-center gap-3">
                   <Globe className="h-4 w-4" />
                   <span>View on IPFS</span>
                 </div>
               </button>
             )}
-            <button className="w-full text-left p-3 rounded-lg bg-slate-700/50 hover:bg-slate-600/50 transition-colors text-slate-300 hover:text-white">
+            <button className="w-full text-left p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors text-gray-600 hover:text-gray-900">
               <div className="flex items-center gap-3">
                 <FileText className="h-4 w-4" />
                 <span>View Contract</span>

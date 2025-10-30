@@ -1,10 +1,8 @@
 "use client";
 
 import { CompactNFTCard } from "@/components/compact-card";
-// import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-// import { Filter, Grid, List } from "lucide-react";
 
 interface CollectionNFTsProps {
   collection: any;
@@ -12,7 +10,7 @@ interface CollectionNFTsProps {
 
 export function CollectionNFTs({ collection }: CollectionNFTsProps) {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-//   const [sortBy, setSortBy] = useState("recent");
+  //   const [sortBy, setSortBy] = useState("recent");
 
   const nfts = collection.nfts || [];
 
@@ -24,10 +22,10 @@ export function CollectionNFTs({ collection }: CollectionNFTsProps) {
         animate={{ opacity: 1 }}
       >
         <div className="text-6xl mb-4">🎨</div>
-        <h3 className="text-xl font-semibold text-white mb-2">
+        <h3 className="text-xl font-semibold text-gray-900 mb-2">
           No NFTs in this collection yet
         </h3>
-        <p className="text-slate-400">
+        <p className="text-gray-600">
           This collection doesn't have any NFTs listed for sale.
         </p>
       </motion.div>
@@ -38,18 +36,18 @@ export function CollectionNFTs({ collection }: CollectionNFTsProps) {
     <div className="space-y-6">
       {/* Controls */}
       <div className="flex items-center justify-between">
-        <div className="text-slate-400">Showing {nfts.length} items</div>
+        <div className="text-gray-600">Showing {nfts.length} items</div>
 
         <div className="flex items-center gap-3">
           {/* View Toggle */}
-          {/* <div className="flex items-center gap-1 p-1 bg-slate-800 rounded-lg">
+          {/* <div className="flex items-center gap-1 p-1 bg-gray-100 rounded-lg">
             <Button
               variant="ghost"
               size="sm"
               className={`p-2 h-8 ${
                 viewMode === "grid"
-                  ? "bg-slate-700 text-white"
-                  : "text-slate-400"
+                  ? "bg-white text-gray-900 shadow-sm"
+                  : "text-gray-600"
               }`}
               onClick={() => setViewMode("grid")}
             >
@@ -60,8 +58,8 @@ export function CollectionNFTs({ collection }: CollectionNFTsProps) {
               size="sm"
               className={`p-2 h-8 ${
                 viewMode === "list"
-                  ? "bg-slate-700 text-white"
-                  : "text-slate-400"
+                  ? "bg-white text-gray-900 shadow-sm"
+                  : "text-gray-600"
               }`}
               onClick={() => setViewMode("list")}
             >
@@ -86,7 +84,7 @@ export function CollectionNFTs({ collection }: CollectionNFTsProps) {
               key={nft.id}
               nft={nft}
               index={index}
-            //   viewMode={viewMode}
+              //   viewMode={viewMode}
             />
           ))}
         </motion.div>

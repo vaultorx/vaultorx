@@ -13,7 +13,7 @@ import { useSession } from "next-auth/react";
 export function CompactNFTCard({
   nft,
   index,
-  categoryColor = "from-blue-500 to-purple-600",
+  categoryColor = "bg-blue-600",
 }: {
   nft: NFTItem;
   index: number;
@@ -109,29 +109,12 @@ export function CompactNFTCard({
       className="group cursor-pointer"
     >
       <Card
-        className="border-slate-700/50 bg-slate-900/40 backdrop-blur-xl overflow-hidden relative h-full"
+        className="border-gray-200 bg-white overflow-hidden relative h-full shadow-sm hover:shadow-md transition-shadow pt-0"
         onClick={handleCardClick}
       >
-        {/* Glow Effect with Category Color */}
-        <motion.div
-          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-lg"
-          style={{
-            background: `linear-gradient(45deg, ${displayColor}, transparent 50%)`,
-            filter: "blur(20px)",
-          }}
-        />
-
-        <div className="relative p-2 h-full flex flex-col">
+        <div className="relative p-2 pt-0 h-full flex flex-col">
           {/* NFT Image Container */}
-          <div className="relative aspect-square overflow-hidden rounded-lg mb-3">
-            {/* Gradient Overlay with Category Color */}
-            <motion.div
-              className="absolute inset-0 opacity-20 z-0"
-              style={{
-                background: `linear-gradient(45deg, ${displayColor})`,
-              }}
-            />
-
+          <div className="relative aspect-square overflow-hidden rounded-lg mb-3 border border-gray-100">
             {/* NFT Image */}
             <motion.img
               src={nft.image}
@@ -145,7 +128,7 @@ export function CompactNFTCard({
             <div className="absolute top-0 left-0 right-0 p-2 flex justify-between items-start z-10">
               {/* Time Badge */}
               <motion.div
-                className="bg-slate-900/90 backdrop-blur-sm rounded-full px-2 py-1 text-xs font-semibold text-white flex items-center gap-1"
+                className="bg-white/95 backdrop-blur-sm rounded-full px-2 py-1 text-xs font-semibold text-gray-700 flex items-center gap-1 border border-gray-200"
                 whileHover={{ scale: 1.05 }}
               >
                 <Clock className="h-3 w-3" />
@@ -159,7 +142,7 @@ export function CompactNFTCard({
                   e.stopPropagation();
                   setLiked(!liked);
                 }}
-                className="bg-slate-900/90 backdrop-blur-sm rounded-full p-1.5 hover:bg-slate-800 transition-colors"
+                className="bg-white/90 backdrop-blur-sm rounded-full p-1.5 hover:bg-gray-100 transition-colors border border-gray-200"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
               >
@@ -177,7 +160,7 @@ export function CompactNFTCard({
                   >
                     <Heart
                       className={`h-3.5 w-3.5 ${
-                        liked ? "fill-red-500 text-red-500" : "text-white"
+                        liked ? "fill-red-500 text-red-500" : "text-gray-600"
                       }`}
                     />
                   </motion.div>
@@ -187,7 +170,7 @@ export function CompactNFTCard({
 
             {/* Rarity Badge */}
             <motion.div
-              className="absolute bottom-2 left-2 bg-slate-900/90 backdrop-blur-sm rounded-full px-2 py-1 text-xs font-semibold text-white z-10"
+              className="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 text-xs font-semibold text-gray-700 z-10 border border-gray-200"
               initial={{ opacity: 0, x: -10 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.2 + 0.3 }}
@@ -204,14 +187,14 @@ export function CompactNFTCard({
             >
               <Button
                 size="sm"
-                className="h-7 w-7 p-0 bg-white/20 backdrop-blur-sm hover:bg-white/30 border-0"
+                className="h-7 w-7 p-0 bg-white/80 backdrop-blur-sm hover:bg-white border border-gray-300"
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
                   router.push(`/nft/${nft.id}`);
                 }}
               >
-                <Eye className="h-3 w-3" />
+                <Eye className="h-3 w-3 text-gray-700" />
               </Button>
             </motion.div>
           </div>
@@ -220,22 +203,22 @@ export function CompactNFTCard({
           <div className="flex-1 flex flex-col justify-between p-2">
             <div>
               {/* Collection Name */}
-              <p className="text-xs text-slate-400 mb-1 truncate">
+              <p className="text-xs text-gray-500 mb-1 truncate">
                 {nft.collection?.name || `Collection ${nft.collectionId}`}
               </p>
 
               {/* NFT Name */}
               <motion.h3
-                className="font-bold text-white text-sm mb-1 truncate"
+                className="font-bold text-gray-900 text-sm mb-1 truncate"
                 animate={{
-                  color: isHovered ? `hsl(var(${displayColor}))` : "white",
+                  color: isHovered ? `#2563eb` : "#111827",
                 }}
               >
                 {nft.name}
               </motion.h3>
 
               {/* Creator */}
-              <p className="text-xs text-slate-500 mb-2">
+              <p className="text-xs text-gray-500 mb-2">
                 by {nft.owner?.username || `User ${nft.ownerId}`}
               </p>
             </div>
@@ -243,7 +226,7 @@ export function CompactNFTCard({
             {/* Stats & Price */}
             <div className="space-y-2">
               {/* Stats Row */}
-              <div className="flex justify-between items-center text-xs text-slate-400">
+              <div className="flex justify-between items-center text-xs text-gray-500">
                 <div className="flex items-center gap-1">
                   <Eye className="h-3 w-3" />
                   <span>
@@ -257,20 +240,16 @@ export function CompactNFTCard({
                   <Heart className="h-3 w-3" />
                   <span>{nft.likes}</span>
                 </div>
-                <div className="flex items-center gap-1">
-                  <TrendingUp className="h-3 w-3" />
-                  <span>+24%</span>
-                </div>
               </div>
 
               {/* Price & Buy Button */}
               <motion.div
-                className="flex items-center justify-between pt-2 border-t border-slate-700/50"
+                className="flex items-center justify-between pt-2 border-t border-gray-200"
                 animate={{ y: isHovered ? -2 : 0 }}
               >
                 <div>
-                  <div className="text-xs text-slate-400">Price</div>
-                  <div className="text-sm font-bold text-white">
+                  <div className="text-xs text-gray-500">Price</div>
+                  <div className="text-sm font-bold text-gray-900">
                     {nft.isListed && nft.listPrice
                       ? formatPrice(nft.listPrice)
                       : "Not Listed"}
@@ -285,7 +264,7 @@ export function CompactNFTCard({
                   >
                     <Button
                       size="sm"
-                      className="text-xs h-7 px-3 bg-blue-500 border-0 gap-1"
+                      className="text-xs h-7 px-3 text-white bg-blue-600 hover:bg-blue-700 border-0 gap-1"
                       onClick={handleBuyClick}
                     >
                       <ShoppingCart className="h-3 w-3" />

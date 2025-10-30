@@ -41,7 +41,9 @@ export default function CollectionPage() {
         setCollection(response.data);
         console.log("Successfully fetched collection:", response.data.name);
       } else {
-        throw new Error(response.message as any || "Failed to load collection");
+        throw new Error(
+          (response.message as any) || "Failed to load collection"
+        );
       }
     } catch (err) {
       console.error("Error fetching collection:", err);
@@ -70,25 +72,25 @@ export default function CollectionPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950">
+      <div className="min-h-screen bg-white">
         <Header />
         <div className="pt-24 px-4 sm:px-10">
           <div className="container mx-auto py-8">
             {/* Back Button Skeleton */}
             <div className="mb-6">
-              <Skeleton className="h-10 w-32 rounded-lg" />
+              <Skeleton className="h-10 w-32 rounded-lg bg-gray-200" />
             </div>
 
             {/* Header Skeleton */}
             <div className="flex flex-col lg:flex-row gap-8 mb-8">
-              <Skeleton className="w-full lg:w-80 h-80 rounded-2xl" />
+              <Skeleton className="w-full lg:w-80 h-80 rounded-2xl bg-gray-200" />
               <div className="flex-1 space-y-4">
-                <Skeleton className="h-12 w-3/4 rounded-lg" />
-                <Skeleton className="h-6 w-1/2 rounded-lg" />
-                <Skeleton className="h-20 w-full rounded-lg" />
+                <Skeleton className="h-12 w-3/4 rounded-lg bg-gray-200" />
+                <Skeleton className="h-6 w-1/2 rounded-lg bg-gray-200" />
+                <Skeleton className="h-20 w-full rounded-lg bg-gray-200" />
                 <div className="flex gap-4">
-                  <Skeleton className="h-10 w-32 rounded-lg" />
-                  <Skeleton className="h-10 w-32 rounded-lg" />
+                  <Skeleton className="h-10 w-32 rounded-lg bg-gray-200" />
+                  <Skeleton className="h-10 w-32 rounded-lg bg-gray-200" />
                 </div>
               </div>
             </div>
@@ -96,21 +98,27 @@ export default function CollectionPage() {
             {/* Stats Skeleton */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
               {Array.from({ length: 4 }).map((_, i) => (
-                <Skeleton key={i} className="h-20 rounded-xl" />
+                <Skeleton key={i} className="h-20 rounded-xl bg-gray-200" />
               ))}
             </div>
 
             {/* Tabs Skeleton */}
             <div className="flex gap-4 mb-8">
               {Array.from({ length: 3 }).map((_, i) => (
-                <Skeleton key={i} className="h-10 w-24 rounded-lg" />
+                <Skeleton
+                  key={i}
+                  className="h-10 w-24 rounded-lg bg-gray-200"
+                />
               ))}
             </div>
 
             {/* Content Skeleton */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {Array.from({ length: 8 }).map((_, i) => (
-                <Skeleton key={i} className="aspect-square rounded-xl" />
+                <Skeleton
+                  key={i}
+                  className="aspect-square rounded-xl bg-gray-200"
+                />
               ))}
             </div>
           </div>
@@ -122,15 +130,15 @@ export default function CollectionPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-slate-950">
+      <div className="min-h-screen bg-white">
         <Header />
         <div className="pt-24 px-4 sm:px-10 min-h-screen flex items-center justify-center">
           <div className="text-center max-w-md">
             <div className="text-6xl mb-4">😞</div>
-            <h3 className="text-xl font-semibold text-white mb-2">
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
               Collection Not Found
             </h3>
-            <p className="text-slate-400 mb-6">{error}</p>
+            <p className="text-gray-600 mb-6">{error}</p>
             <div className="flex gap-3 justify-center">
               <Button onClick={fetchCollection} className="gap-2">
                 <RefreshCw className="h-4 w-4" />
@@ -149,15 +157,15 @@ export default function CollectionPage() {
 
   if (!collection) {
     return (
-      <div className="min-h-screen bg-slate-950">
+      <div className="min-h-screen bg-white">
         <Header />
         <div className="pt-24 px-4 sm:px-10 min-h-screen flex items-center justify-center">
           <div className="text-center">
             <div className="text-6xl mb-4">🔍</div>
-            <h3 className="text-xl font-semibold text-white mb-2">
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
               Collection Not Found
             </h3>
-            <p className="text-slate-400 mb-4">
+            <p className="text-gray-600 mb-4">
               The collection you're looking for doesn't exist.
             </p>
             <Link href="/collections">
@@ -171,15 +179,15 @@ export default function CollectionPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="min-h-screen bg-white">
       <Header />
 
       <div className="pt-24 px-4 sm:px-10">
         <div className="container mx-auto py-8">
           {/* Debug Info */}
           {process.env.NODE_ENV === "development" && (
-            <div className="mb-4 p-4 bg-slate-800/50 rounded-lg">
-              <div className="text-sm text-slate-400">
+            <div className="mb-4 p-4 bg-gray-100 rounded-lg">
+              <div className="text-sm text-gray-600">
                 Collection: {collection.name}, NFTs: {collection.nfts?.length},
                 Listed: {collection.listedItems}, Volume:{" "}
                 {collection.totalVolume} ETH
@@ -196,7 +204,7 @@ export default function CollectionPage() {
             <Link href="/collections">
               <Button
                 variant="ghost"
-                className="mb-6 gap-2 text-slate-400 hover:text-white"
+                className="mb-6 gap-2 text-gray-600 hover:text-gray-900"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Back to Collections

@@ -1,4 +1,3 @@
-// components/trending-nfts.tsx
 "use client";
 
 import {
@@ -19,6 +18,7 @@ import { useState } from "react";
 import { CompactNFTCard } from "./compact-card";
 import { Button } from "@/components/ui/button";
 import { useCategories, useCategoryNFTs } from "@/hooks/use-categories";
+import Link from "next/link";
 
 // Icon mapping for categories
 const CATEGORY_ICONS: { [key: string]: any } = {
@@ -62,7 +62,7 @@ export function TrendingNFTs() {
 
   if (categoriesLoading) {
     return (
-      <section className="py-20 bg-linear-to-b px-8 pt-24 sm:px-16 from-slate-950 to-slate-700 relative overflow-hidden">
+      <section className="py-20 bg-white px-8 pt-24 sm:px-16 relative overflow-hidden">
         <div className="container mx-auto px-4 text-center">
           <div className="flex justify-center">
             <motion.div
@@ -72,39 +72,19 @@ export function TrendingNFTs() {
                 repeat: Infinity,
                 ease: "linear",
               }}
-              className="h-12 w-12 border-4 border-slate-700 border-t-blue-500 rounded-full"
+              className="h-12 w-12 border-4 border-gray-300 border-t-blue-600 rounded-full"
             />
           </div>
-          <p className="text-slate-400 mt-4">Loading categories...</p>
+          <p className="text-gray-600 mt-4">Loading categories...</p>
         </div>
       </section>
     );
   }
 
   return (
-    <section className="py-20 bg-linear-to-b px-8 pt-24 sm:px-16 from-slate-950 to-slate-700 relative overflow-hidden">
-      {/* Floating Particles */}
-      <div className="absolute inset-0">
-        {[...Array(20)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 bg-blue-500/30 rounded-full"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              y: [0, -100, 0],
-              opacity: [0, 1, 0],
-            }}
-            transition={{
-              duration: 3 + Math.random() * 2,
-              repeat: Infinity,
-              delay: Math.random() * 2,
-            }}
-          />
-        ))}
-      </div>
+    <section className="py-20 bg-white px-8 pt-24 sm:px-16 relative overflow-hidden">
+      {/* Simple Background */}
+      <div className="absolute inset-0 bg-gray-50/50" />
 
       <div className="container mx-auto px-4 relative z-10">
         <motion.div
@@ -115,19 +95,16 @@ export function TrendingNFTs() {
           viewport={{ once: true }}
         >
           <motion.div
-            className="inline-flex items-center gap-2 text-cyan-400 mb-4"
+            className="inline-flex items-center gap-2 text-blue-600 mb-4"
             whileHover={{ scale: 1.05 }}
           >
             <Sparkles className="h-5 w-5" />
             <span className="font-semibold">TRENDING BY CATEGORY</span>
           </motion.div>
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            Explore{" "}
-            <span className="bg-linear-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
-              Categories
-            </span>
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+            Explore <span className="text-blue-600">Categories</span>
           </h2>
-          <p className="text-lg text-slate-400 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Discover trending NFTs across different categories and find your
             next digital asset
           </p>
@@ -145,8 +122,8 @@ export function TrendingNFTs() {
             key="all"
             className={`px-4 py-3 rounded-xl font-medium text-sm capitalize transition-all flex items-center gap-2 ${
               activeCategory === "all"
-                ? "bg-linear-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25"
-                : "text-slate-400 hover:text-white bg-slate-800/50 hover:bg-slate-700/50 border border-slate-700/50"
+                ? "bg-blue-600 shadow-md"
+                : "text-gray-600 hover:text-gray-900 bg-white hover:bg-gray-50 border border-gray-200"
             }`}
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.95 }}
@@ -157,20 +134,18 @@ export function TrendingNFTs() {
           </motion.button>
 
           {categories.slice(0, visibleCategories).map((category) => {
-            const IconComponent = CATEGORY_ICONS[category.id] || Sparkles;
             return (
               <motion.button
                 key={category.id}
                 className={`px-4 py-3 rounded-xl font-medium text-sm capitalize transition-all flex items-center gap-2 ${
                   activeCategory === category.id
-                    ? `bg-linear-to-r ${category.color} text-white shadow-lg shadow-blue-500/25`
-                    : "text-slate-400 hover:text-white bg-slate-800/50 hover:bg-slate-700/50 border border-slate-700/50"
+                    ? `bg-blue-600 shadow-md`
+                    : "text-gray-600 hover:text-gray-900 bg-white hover:bg-gray-50 border border-gray-200"
                 }`}
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setActiveCategory(category.id)}
               >
-                <IconComponent className="h-4 w-4" />
                 {category.name}
               </motion.button>
             );
@@ -178,7 +153,7 @@ export function TrendingNFTs() {
 
           {visibleCategories < categories.length && (
             <motion.button
-              className="px-4 py-3 rounded-xl font-medium text-sm text-slate-400 hover:text-white bg-slate-800/50 hover:bg-slate-700/50 border border-slate-700/50 transition-all flex items-center gap-2"
+              className="px-4 py-3 rounded-xl font-medium text-sm text-gray-600 hover:text-gray-900 bg-white hover:bg-gray-50 border border-gray-200 transition-all flex items-center gap-2"
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
               onClick={showMoreCategories}
@@ -192,7 +167,6 @@ export function TrendingNFTs() {
         {/* Category Sections */}
         <div className="space-y-16">
           {displayCategories.map((category, categoryIndex) => {
-            const IconComponent = CATEGORY_ICONS[category.id] || Sparkles;
             return (
               <motion.section
                 key={category.id}
@@ -204,30 +178,26 @@ export function TrendingNFTs() {
                 {/* Category Header */}
                 <div className="flex items-center justify-between mb-8">
                   <div className="flex items-center gap-4">
-                    <div
-                      className={`p-3 rounded-xl bg-linear-to-r ${category.color}`}
-                    >
-                      <IconComponent className="h-6 w-6 text-white" />
-                    </div>
                     <div>
-                      <h3 className="text-2xl md:text-3xl font-bold text-white">
+                      <h3 className="text-2xl md:text-3xl font-bold text-gray-900">
                         {category.name}
                       </h3>
-                      <p className="text-slate-400">
+                      <p className="text-gray-600">
                         {category?.nftCount} NFTs available
                       </p>
                     </div>
                   </div>
 
                   <motion.div whileHover={{ scale: 1.05 }}>
-                    <Button
-                      variant="outline"
-                      className="border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white gap-2"
-                      onClick={() => setActiveCategory(category.id)}
-                    >
-                      View All
-                      <ArrowRight className="h-4 w-4" />
-                    </Button>
+                    <Link href={`/nft?category=${category.id}`}>
+                      <Button
+                        variant="outline"
+                        className="border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-gray-900 gap-2"
+                      >
+                        View All
+                        <ArrowRight className="h-4 w-4" />
+                      </Button>
+                    </Link>
                   </motion.div>
                 </div>
 
@@ -237,7 +207,7 @@ export function TrendingNFTs() {
                     {[...Array(5)].map((_, i) => (
                       <div
                         key={i}
-                        className="aspect-square bg-slate-800 rounded-lg animate-pulse"
+                        className="aspect-square bg-gray-200 rounded-lg animate-pulse"
                       />
                     ))}
                   </div>
@@ -250,7 +220,7 @@ export function TrendingNFTs() {
                           key={nft.id}
                           nft={nft}
                           index={nftIndex}
-                          categoryColor={category.color}
+                          categoryColor="bg-blue-600"
                         />
                       ))}
                   </div>
@@ -272,7 +242,7 @@ export function TrendingNFTs() {
             <Button
               variant="outline"
               size="lg"
-              className="border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white gap-3"
+              className="border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-gray-900 gap-3"
               onClick={() => setActiveCategory(categories[0]?.id || "art")}
             >
               Explore All Categories

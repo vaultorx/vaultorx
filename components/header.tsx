@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { Search, Bell, Rocket, User, LogIn, UserPlus } from "lucide-react";
+import { Search, Bell, User, LogIn, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
@@ -20,7 +20,6 @@ export function Header() {
       setIsScrolled(window.scrollY > 20);
     };
 
-    // Add keyboard shortcut
     const down = (e: KeyboardEvent) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
@@ -40,7 +39,7 @@ export function Header() {
   return (
     <>
       <motion.header
-        className="fixed top-0 z-50 w-full border-b bg-slate-950/80 backdrop-blur-xl border-slate-800/50"
+        className="fixed top-0 z-50 w-full border-b bg-white/90 backdrop-blur-xl border-gray-200"
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
@@ -49,13 +48,11 @@ export function Header() {
           {/* Logo */}
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Link href="/" className="relative flex items-center gap-3">
-              <span className="text-xl font-bold bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
-                Vaultorx
-              </span>
+              <span className="text-xl font-bold text-gray-900">Vaultorx</span>
             </Link>
           </motion.div>
 
-          {/* Search Bar - Hidden on mobile, shown on desktop */}
+          {/* Search Bar */}
           <motion.div
             className="hidden md:flex flex-1 max-w-md mx-8"
             initial={{ opacity: 0 }}
@@ -63,15 +60,15 @@ export function Header() {
             transition={{ delay: 0.2 }}
           >
             <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
               <Input
                 placeholder="Search collections, NFTs, creators..."
-                className="pl-10 pr-4 h-10 bg-slate-800/50 border-slate-700 focus-visible:ring-2 focus-visible:ring-blue-500 text-white placeholder-slate-400 cursor-pointer"
+                className="pl-10 pr-4 h-10 bg-gray-50 border-gray-300 focus-visible:ring-2 focus-visible:ring-blue-500 text-gray-900 placeholder-gray-500 cursor-pointer"
                 onClick={() => setSearchOpen(true)}
                 readOnly
               />
               <div className="absolute right-2 top-1/2 -translate-y-1/2">
-                <kbd className="bg-slate-700 text-slate-300 text-xs px-2 py-1 rounded border border-slate-600">
+                <kbd className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded border border-gray-300">
                   ⌘K
                 </kbd>
               </div>
@@ -84,7 +81,7 @@ export function Header() {
           <div className="flex items-center gap-3">
             {/* Mobile Search */}
             <motion.button
-              className="md:hidden p-2 text-slate-400 hover:text-white transition-colors"
+              className="md:hidden p-2 text-gray-500 hover:text-gray-700 transition-colors"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={() => setSearchOpen(true)}
@@ -103,7 +100,7 @@ export function Header() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white gap-2"
+                      className="border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-gray-900 gap-2"
                     >
                       <LogIn className="h-4 w-4" />
                       Login
@@ -118,7 +115,7 @@ export function Header() {
                   <Link href="/signup">
                     <Button
                       size="sm"
-                      className="bg-blue-500 gap-2 hover:bg-blue-600"
+                      className="bg-blue-600 text-white gap-2 hover:bg-blue-700"
                     >
                       <UserPlus className="h-4 w-4" />
                       Sign Up
@@ -136,7 +133,7 @@ export function Header() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white gap-2"
+                      className="border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-gray-900 gap-2"
                     >
                       <User className="h-4 w-4" />
                       Dashboard

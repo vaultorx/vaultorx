@@ -30,8 +30,8 @@ export function CollectionGrid({
             key={i}
             className={
               viewMode === "grid"
-                ? "aspect-square rounded-xl"
-                : "h-32 rounded-xl"
+                ? "aspect-square rounded-xl bg-gray-200"
+                : "h-32 rounded-xl bg-gray-200"
             }
           />
         ))}
@@ -49,10 +49,10 @@ export function CollectionGrid({
           exit={{ opacity: 0 }}
         >
           <div className="text-6xl mb-4">🔍</div>
-          <h3 className="text-xl font-semibold text-white mb-2">
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">
             No collections found
           </h3>
-          <p className="text-slate-400">
+          <p className="text-gray-600">
             Try adjusting your filters or search terms
           </p>
         </motion.div>

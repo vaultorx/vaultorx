@@ -60,6 +60,7 @@ model User {
   Exhibition              Exhibition[]
   ExhibitionParticipation ExhibitionParticipation[]
 
+  @@index([username, name, email])
   @@map("users")
 }
 
@@ -129,6 +130,8 @@ model Collection {
   ExhibitionCollection              ExhibitionCollection[]
   ExhibitionParticipationCollection ExhibitionParticipationCollection[]
 
+  @@index([name, description])
+  @@index([totalVolume])
   @@map("collections")
 }
 
@@ -167,6 +170,9 @@ model NFTItem {
   ExhibitionParticipationNFT ExhibitionParticipationNFT[]
 
   @@unique([collectionId, tokenId])
+  @@index([name, description])
+  @@index([isListed])
+  @@index([views])
   @@map("nft_items")
 }
 
@@ -239,6 +245,9 @@ model Exhibition {
   exhibitionNFTs          ExhibitionNFT[]
   ExhibitionParticipation ExhibitionParticipation[]
 
+  @@index([title, description])
+  @@index([tags])
+  @@index([views])
   @@map("exhibitions")
 }
 

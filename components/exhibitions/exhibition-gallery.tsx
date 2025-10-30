@@ -125,7 +125,7 @@ export function ExhibitionGallery() {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
-      <section className="bg-linear-to-br from-purple-600 via-blue-600 to-cyan-500 text-white py-20">
+      <section className="bg-slate-100 py-20">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-6xl font-bold mb-6">
             Discover NFT Exhibitions
@@ -134,7 +134,7 @@ export function ExhibitionGallery() {
             Explore curated digital art galleries, virtual exhibitions, and
             immersive NFT experiences from creators worldwide.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          {/* <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" variant="secondary" asChild>
               <Link href="#exhibitions">Explore Exhibitions</Link>
             </Button>
@@ -148,7 +148,7 @@ export function ExhibitionGallery() {
                 Participate as Artist
               </Link>
             </Button>
-          </div>
+          </div> */}
         </div>
       </section>
 

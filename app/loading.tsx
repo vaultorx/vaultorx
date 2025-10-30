@@ -1,18 +1,18 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Move3D, Rocket, Sparkles, Zap } from "lucide-react";
+import { Move3D, Sparkles, Zap } from "lucide-react";
 
 export default function Loading() {
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-950 via-blue-950 to-purple-950 flex items-center justify-center relative overflow-hidden">
+    <div className="min-h-screen bg--white flex items-center justify-center relative overflow-hidden">
       {/* Animated Background */}
       <div className="absolute inset-0">
         {/* Floating Particles */}
         {[...Array(20)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-1 h-1 bg-blue-500/40 rounded-full"
+            className="absolute w-1 h-1 bg-blue-400/40 rounded-full"
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
@@ -32,7 +32,7 @@ export default function Loading() {
 
         {/* Animated Orbs */}
         <motion.div
-          className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl"
+          className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-200/30 rounded-full blur-3xl"
           animate={{
             x: [0, 100, 0],
             y: [0, -50, 0],
@@ -41,7 +41,7 @@ export default function Loading() {
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
-          className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl"
+          className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-200/30 rounded-full blur-3xl"
           animate={{
             x: [0, -100, 0],
             y: [0, 50, 0],
@@ -60,12 +60,11 @@ export default function Loading() {
           transition={{ type: "spring", stiffness: 200, damping: 15 }}
         >
           <div className="relative">
-
             {/* Orbiting Elements */}
             {[0, 1, 2].map((i) => (
               <motion.div
                 key={i}
-                className="absolute h-6 w-6 rounded-full bg-linear-to-r from-cyan-400 to-blue-400 flex items-center justify-center shadow-lg shadow-cyan-500/50"
+                className="absolute h-6 w-6 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 flex items-center justify-center shadow-lg shadow-blue-500/30"
                 style={{
                   top: "50%",
                   left: "50%",
@@ -96,19 +95,19 @@ export default function Loading() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
         >
-          <h1 className="text-4xl md:text-6xl font-bold bg-linear-to-r from-white via-blue-200 to-cyan-200 bg-clip-text text-transparent mb-4">
+          <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-gray-900 via-blue-600 to-cyan-600 bg-clip-text text-transparent mb-4">
             Vaultorx
           </h1>
-          <p className="text-slate-400 text-lg md:text-xl mb-8 max-w-md mx-auto">
+          <p className="text-gray-600 text-lg md:text-xl mb-8 max-w-md mx-auto">
             Loading the future of digital ownership
           </p>
         </motion.div>
 
         {/* Progress Indicator */}
         <div className="max-w-md mx-auto">
-          <div className="h-2 bg-slate-800 rounded-full overflow-hidden mb-4">
+          <div className="h-2 bg-gray-200 rounded-full overflow-hidden mb-4">
             <motion.div
-              className="h-full bg-linear-to-r from-blue-500 to-purple-600 rounded-full"
+              className="h-full bg-gradient-to-r from-blue-500 to-purple-600 rounded-full"
               initial={{ width: "0%" }}
               animate={{ width: "100%" }}
               transition={{ duration: 2, ease: "easeInOut" }}
@@ -120,7 +119,7 @@ export default function Loading() {
             {[0, 1, 2].map((i) => (
               <motion.div
                 key={i}
-                className="h-2 w-2 bg-blue-400 rounded-full"
+                className="h-2 w-2 bg-blue-500 rounded-full"
                 animate={{
                   scale: [1, 1.5, 1],
                   opacity: [0.5, 1, 0.5],
@@ -134,31 +133,6 @@ export default function Loading() {
             ))}
           </div>
         </div>
-
-        {/* Stats Preview */}
-        <motion.div
-          className="flex justify-center gap-8 mt-12 text-slate-400"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
-        >
-          {[
-            { value: "4.2B+", label: "Volume" },
-            { value: "980K+", label: "Collectors" },
-            { value: "2.1M+", label: "NFTs" },
-          ].map((stat, index) => (
-            <motion.div
-              key={stat.label}
-              className="text-center"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.2 + index * 0.1 }}
-            >
-              <div className="text-2xl font-bold text-white">{stat.value}</div>
-              <div className="text-sm">{stat.label}</div>
-            </motion.div>
-          ))}
-        </motion.div>
       </div>
     </div>
   );

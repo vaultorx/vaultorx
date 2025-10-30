@@ -13,21 +13,23 @@ export function CollectionStats({ collection }: CollectionStatsProps) {
   const stats = [
     {
       label: "Floor Price",
-      value: collection.floorPrice ? `${collection?.floorPrice?.toFixed(4)} ETH` : "—",
+      value: collection.floorPrice
+        ? `${collection?.floorPrice?.toFixed(4)} ETH`
+        : "—",
       icon: DollarSign,
-      color: "text-green-400",
+      color: "text-green-600",
     },
     {
       label: "Total Volume",
       value: `${collection?.totalVolume?.toFixed(1) || 0} ETH`,
       icon: TrendingUp,
-      color: "text-blue-400",
+      color: "text-blue-600",
     },
     {
       label: "Items",
       value: collection?.totalItems?.toString() || 0,
       icon: Package,
-      color: "text-purple-400",
+      color: "text-purple-600",
     },
     {
       label: "Listed",
@@ -37,7 +39,7 @@ export function CollectionStats({ collection }: CollectionStatsProps) {
           100
       )}%)`,
       icon: Eye,
-      color: "text-amber-400",
+      color: "text-amber-600",
     },
   ];
 
@@ -53,17 +55,17 @@ export function CollectionStats({ collection }: CollectionStatsProps) {
         return (
           <Card
             key={stat.label}
-            className="p-6 bg-slate-800/50 backdrop-blur-xl border-slate-700/50 hover:border-slate-600 transition-all duration-300"
+            className="p-6 bg-white border-gray-200 hover:border-gray-300 transition-all duration-300"
           >
             <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-lg bg-slate-700/50 ${stat.color}`}>
+              <div className={`p-2 rounded-lg bg-gray-100 ${stat.color}`}>
                 <Icon className="h-5 w-5" />
               </div>
               <div>
                 <div className={`text-2xl font-bold ${stat.color}`}>
                   {stat.value}
                 </div>
-                <div className="text-slate-400 text-sm">{stat.label}</div>
+                <div className="text-gray-600 text-sm">{stat.label}</div>
               </div>
             </div>
           </Card>

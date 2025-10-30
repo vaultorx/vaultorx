@@ -116,15 +116,15 @@ export default function CollectionsPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-slate-950">
+      <div className="min-h-screen bg-white">
         <Header />
         <div className="pt-24 px-4 sm:px-10 min-h-screen flex items-center justify-center">
           <div className="text-center">
             <div className="text-6xl mb-4">😞</div>
-            <h3 className="text-xl font-semibold text-white mb-2">
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
               Failed to load collections
             </h3>
-            <p className="text-slate-400 mb-4">{error}</p>
+            <p className="text-gray-600 mb-4">{error}</p>
             <Button onClick={() => refetch()}>Try Again</Button>
           </div>
         </div>
@@ -134,7 +134,7 @@ export default function CollectionsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="min-h-screen bg-white">
       <Header />
 
       <div className="pt-24 px-4 sm:px-10 min-h-screen">
@@ -146,10 +146,10 @@ export default function CollectionsPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-linear-to-r from-white to-slate-300 bg-clip-text text-transparent">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900">
               Explore Collections
             </h1>
-            <p className="text-lg text-slate-400 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               Discover amazing NFT collections from talented creators and
               established artists
             </p>
@@ -163,42 +163,42 @@ export default function CollectionsPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
             >
-              <div className="bg-slate-800/50 backdrop-blur-xl rounded-xl p-6 border border-slate-700/50">
-                <div className="text-2xl font-bold text-white">
+              <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                <div className="text-2xl font-bold text-gray-900">
                   {stats.totalVolume.toFixed(1)} ETH
                 </div>
-                <div className="text-slate-400 text-sm">Total Volume</div>
+                <div className="text-gray-600 text-sm">Total Volume</div>
               </div>
-              <div className="bg-slate-800/50 backdrop-blur-xl rounded-xl p-6 border border-slate-700/50">
-                <div className="text-2xl font-bold text-white">
+              <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                <div className="text-2xl font-bold text-gray-900">
                   {stats.avgFloor.toFixed(2)} ETH
                 </div>
-                <div className="text-slate-400 text-sm">Average Floor</div>
+                <div className="text-gray-600 text-sm">Average Floor</div>
               </div>
-              <div className="bg-slate-800/50 backdrop-blur-xl rounded-xl p-6 border border-slate-700/50">
-                <div className="text-2xl font-bold text-white">
+              <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                <div className="text-2xl font-bold text-gray-900">
                   {stats.totalItems}
                 </div>
-                <div className="text-slate-400 text-sm">Total Items</div>
+                <div className="text-gray-600 text-sm">Total Items</div>
               </div>
             </motion.div>
           )}
 
           {/* Search and Controls */}
           <motion.div
-            className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-8 p-6 bg-slate-900/40 backdrop-blur-xl rounded-xl border border-slate-700/50"
+            className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-8 p-6 bg-gray-50 rounded-xl border border-gray-200"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             {/* Search */}
             <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
               <Input
                 placeholder="Search collections..."
                 value={searchQuery}
                 onChange={(e) => handleSearchChange(e.target.value)}
-                className="pl-10 pr-4 h-12 bg-slate-800/50 border-slate-700 focus-visible:ring-2 focus-visible:ring-blue-500 text-white placeholder-slate-400 rounded-xl"
+                className="pl-10 pr-4 h-12 bg-white border-gray-300 focus-visible:ring-2 focus-visible:ring-blue-500 text-gray-900 placeholder-gray-500 rounded-xl"
               />
             </div>
 
@@ -217,14 +217,14 @@ export default function CollectionsPage() {
               />
 
               {/* View Toggle */}
-              <div className="flex items-center gap-1 p-1 bg-slate-800 rounded-lg">
+              <div className="flex items-center gap-1 p-1 bg-gray-100 rounded-lg">
                 <Button
                   variant="ghost"
                   size="sm"
                   className={`p-2 h-8 ${
                     viewMode === "grid"
-                      ? "bg-slate-700 text-white"
-                      : "text-slate-400"
+                      ? "bg-white text-gray-900 shadow-sm"
+                      : "text-gray-600"
                   }`}
                   onClick={() => setViewMode("grid")}
                 >
@@ -235,8 +235,8 @@ export default function CollectionsPage() {
                   size="sm"
                   className={`p-2 h-8 ${
                     viewMode === "list"
-                      ? "bg-slate-700 text-white"
-                      : "text-slate-400"
+                      ? "bg-white text-gray-900 shadow-sm"
+                      : "text-gray-600"
                   }`}
                   onClick={() => setViewMode("list")}
                 >
@@ -248,8 +248,8 @@ export default function CollectionsPage() {
 
           {/* Debug Info */}
           {process.env.NODE_ENV === "development" && (
-            <div className="mb-4 p-4 bg-slate-800/50 rounded-lg">
-              <div className="text-sm text-slate-400">
+            <div className="mb-4 p-4 bg-gray-100 rounded-lg">
+              <div className="text-sm text-gray-600">
                 Debug: Loading: {loading.toString()}, Collections:{" "}
                 {collections.length}, Params: {JSON.stringify(filterParams)}
               </div>
@@ -275,7 +275,7 @@ export default function CollectionsPage() {
               <Button
                 variant="outline"
                 size="lg"
-                className="border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white px-8"
+                className="border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-gray-900 px-8"
                 onClick={handleLoadMore}
               >
                 Load More Collections
