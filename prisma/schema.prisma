@@ -172,7 +172,7 @@ model NFTItem {
 
 model Transaction {
   id              String            @id @default(uuid())
-  transactionHash String            @unique
+  transactionHash String?           @unique
   nftItemId       String?
   fromUserId      String?
   toUserId        String?

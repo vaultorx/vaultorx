@@ -22,6 +22,10 @@ import {
   Award,
 } from "lucide-react";
 import { useAuctions, useAuctionStats } from "@/hooks/use-auctions";
+import { CreateAuctionForm } from "@/components/auctions/create-auction-form";
+import { useNFTs } from "@/hooks/use-nfts";
+import { AuctionActions } from "@/components/auctions/auction-actions";
+import Link from "next/link";
 
 export default function AuctionsPage() {
   const [activeTab, setActiveTab] = useState("live");
@@ -29,6 +33,7 @@ export default function AuctionsPage() {
     status: activeTab === "all" ? undefined : activeTab,
   });
   const { stats: auctionStats, loading: statsLoading } = useAuctionStats();
+  const { nfts: userNFTs } = useNFTs({ limit: 50 });
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -69,6 +74,29 @@ export default function AuctionsPage() {
           </div>
         </div>
       </div>
+    );
+  }
+
+  {
+    !loading && auctions.length === 0 && (
+      <Card>
+        <CardContent className="pt-6">
+          <div className="text-center py-12">
+            <Gavel className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">No auctions found</h3>
+            <p className="text-muted-foreground mb-4">
+              {activeTab === "live" &&
+                "You don't have any live auctions right now."}
+              {activeTab === "upcoming" &&
+                "You don't have any upcoming auctions scheduled."}
+              {activeTab === "ended" &&
+                "You don't have any completed auctions."}
+              {activeTab === "all" && "You haven't created any auctions yet."}
+            </p>
+            <CreateAuctionForm userNFTs={userNFTs} />
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
@@ -174,10 +202,7 @@ export default function AuctionsPage() {
               </TabsList>
             </Tabs>
 
-            <Button className="gap-2">
-              <Plus className="h-4 w-4" />
-              Create Auction
-            </Button>
+            <CreateAuctionForm userNFTs={userNFTs} />
           </div>
 
           {/* Loading State */}
@@ -208,17 +233,22 @@ export default function AuctionsPage() {
                   key={auction.id}
                   className="group cursor-pointer hover:shadow-lg transition-shadow"
                 >
-                  <CardHeader className="pb-4">
-                    <div className="flex items-start justify-between mb-2">
+                  <CardHeader className="py-2">
+                    <div className="flex items-start flex-1 justify-between">
                       <CardTitle className="text-lg">
                         {auction.nftItem?.name}
                       </CardTitle>
-                      {getStatusBadge(auction.status)}
+                      <div className="flex items-center gap-2">
+                        {getStatusBadge(auction.status)}
+                        <AuctionActions auction={auction} />
+                      </div>
                     </div>
-                    <CardDescription>{auction.nftItem?.collection?.name}</CardDescription>
+                    <CardDescription>
+                      {auction.nftItem?.collection?.name}
+                    </CardDescription>
                   </CardHeader>
 
-                  <CardContent className="space-y-4">
+                  <CardContent className="space-y-2">
                     {/* Auction Image */}
                     <div className="aspect-square bg-muted rounded-lg flex items-center justify-center relative">
                       <div className="text-center text-muted-foreground">
@@ -242,7 +272,7 @@ export default function AuctionsPage() {
                         <div>
                           <p className="text-muted-foreground">Auction Type</p>
                           <p className="font-semibold capitalize">
-                            {auction.type}
+                            {auction.type.replaceAll("_", " ")}
                           </p>
                         </div>
                         <div>
@@ -252,7 +282,10 @@ export default function AuctionsPage() {
                               : "Current Bid"}
                           </p>
                           <p className="font-semibold text-lg">
-                            {auction.buyNowPrice || auction.startingPrice || 0} ETH
+                            {auction.buyNowPrice?.toFixed(4) ||
+                              auction.startingPrice?.toFixed(4) ||
+                              0}{" "}
+                            ETH
                           </p>
                         </div>
                       </div>
@@ -262,7 +295,7 @@ export default function AuctionsPage() {
                           <div>
                             <p className="text-muted-foreground">Minimum Bid</p>
                             <p className="font-semibold">
-                              {auction.minimumBid || 0} ETH
+                              {auction.minimumBid?.toFixed(4) || 0} ETH
                             </p>
                           </div>
                           <div>
@@ -270,7 +303,7 @@ export default function AuctionsPage() {
                               Bid Increment
                             </p>
                             <p className="font-semibold">
-                              {auction.bidIncrement || 0} ETH
+                              {auction.bidIncrement?.toFixed(4) || 0} ETH
                             </p>
                           </div>
                         </div>
@@ -283,7 +316,7 @@ export default function AuctionsPage() {
                               Starting Price
                             </p>
                             <p className="font-semibold">
-                              {auction.startingPrice || 0} ETH
+                              {auction.startingPrice?.toFixed(4) || 0} ETH
                             </p>
                           </div>
                           <div>
@@ -291,7 +324,7 @@ export default function AuctionsPage() {
                               Reserve Price
                             </p>
                             <p className="font-semibold">
-                              {auction.reservePrice || 0} ETH
+                              {auction.reservePrice?.toFixed(4) || 0} ETH
                             </p>
                           </div>
                         </div>
@@ -331,10 +364,13 @@ export default function AuctionsPage() {
                               ? "outline"
                               : "secondary"
                           }
+                          asChild
                         >
-                          {auction.status === "live" && "Place Bid"}
-                          {auction.status === "upcoming" && "View Details"}
-                          {auction.status === "ended" && "View Results"}
+                          <Link href={`/auctions/${auction.id}`}>
+                            {auction.status === "live" && "Place Bid"}
+                            {auction.status === "upcoming" && "View Details"}
+                            {auction.status === "ended" && "View Results"}
+                          </Link>
                         </Button>
                       </div>
                     </div>

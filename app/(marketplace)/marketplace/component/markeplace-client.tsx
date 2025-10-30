@@ -28,13 +28,10 @@ export default function MarketplaceClient() {
   const [page, setPage] = useState(1);
   const searchParams = useSearchParams();
 
-  const { nfts, loading, error, pagination, refetch } = useNFTs({
-    search: searchQuery,
-    sortBy,
-    sortOrder: sortBy === "price-low" ? "asc" : "desc",
-    page,
-    limit: 12,
-  });
+   const { nfts, loading, error, pagination, refetch } = useNFTs({
+     page,
+     limit: 12,
+   });
 
   // Read search query from URL on component mount
   useEffect(() => {

@@ -23,7 +23,7 @@ export function HomeFooter() {
       <div className="container mx-auto px-4 relative z-10">
         {/* Features Bar */}
         <motion.div
-          className="py-8 border-t border-slate-800 grid grid-cols-1 md:grid-cols-3 gap-6"
+          className="py-8 border-t border-slate-800 grid grid-cols-1 md:grid-cols-2 gap-6"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
@@ -41,11 +41,11 @@ export function HomeFooter() {
               title: "Instant Transactions",
               description: "Near-zero gas fees and lightning-fast settlements",
             },
-            {
-              icon: Globe,
-              title: "Multi-chain",
-              description: "Support for Ethereum, Polygon, Solana, and more",
-            },
+            // {
+            //   icon: Globe,
+            //   title: "Multi-chain",
+            //   description: "Support for Ethereum, Polygon, Solana, and more",
+            // },
           ].map((feature, index) => (
             <motion.div
               key={feature.title}

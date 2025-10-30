@@ -80,7 +80,7 @@ export function DashboardRecentActivity({
                 <div className="text-sm text-muted-foreground">
                   {activity.price && (
                     <span className="font-medium text-foreground">
-                      {activity.price}
+                      {activity.price.toFixed(4) || 0} ETH
                     </span>
                   )}
                   {activity.from && activity.to && (

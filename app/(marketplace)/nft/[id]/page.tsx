@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 interface ETHPriceData {
   price: number;
@@ -39,10 +40,11 @@ interface ETHPriceData {
 export default function NFTDetailPage({
   params,
 }: {
-  params: Promise<{ id: string }>
+  params: Promise<{ id: string }>;
 }) {
   const { id: nftId } = use(params);
   const router = useRouter();
+  const { data: session } = useSession();
 
   const [nft, setNft] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -153,24 +155,28 @@ export default function NFTDetailPage({
 
   // Handle buy now redirection
   const handleBuyNow = () => {
-    if (!nft) return;
+    if (!session) {
+      // User not logged in - redirect to login with purchase intent
+      const nftData = {
+        id: nft.id,
+        name: nft.name,
+        price: nft.price,
+        image: nft.image,
+        collectionName: nft.collectionName,
+        currency: nft.currency,
+        owner: nft.owner,
+        description: nft.description,
+        rarity: nft.rarity,
+      };
 
-    // Prepare NFT data for purchase page
-    const nftData = {
-      id: nft.id,
-      name: nft.name,
-      price: nft.listPrice,
-      image: nft.image,
-      collectionName: nft.collection.name,
-      currency: nft.currency,
-      owner: nft.owner?.username,
-      description: nft.description,
-      rarity: nft.rarity,
-    };
-
-    // Redirect to purchase page with NFT data
-    const queryString = encodeURIComponent(JSON.stringify(nftData));
-    router.push(`/dashboard/purchase?nft=${queryString}`);
+      const encodedNft = encodeURIComponent(JSON.stringify(nftData));
+      router.push(`/login?redirect=/dashboard/purchase&nft=${encodedNft}`);
+    } else {
+      // User is logged in - go directly to purchase
+      router.push(
+        `/dashboard/purchase?nft=${encodeURIComponent(JSON.stringify(nft))}`
+      );
+    }
   };
 
   if (!nft && loading) {
@@ -226,8 +232,6 @@ export default function NFTDetailPage({
       </div>
     );
   }
-
-  
 
   return (
     <div className="min-h-screen bg-slate-950">

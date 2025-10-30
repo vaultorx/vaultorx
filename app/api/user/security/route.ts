@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
-import bcrypt from "bcryptjs";
+
+// Force this route to use Node.js runtime
+export const runtime = 'nodejs';
 
 export async function PUT(request: NextRequest) {
   try {
@@ -47,6 +49,8 @@ export async function PUT(request: NextRequest) {
           { status: 400 }
         );
       }
+
+      const bcrypt = require("bcrypt");
 
       const isCurrentPasswordValid = await bcrypt.compare(
         currentPassword,

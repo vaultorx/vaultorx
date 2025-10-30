@@ -28,23 +28,10 @@ const nextConfig: NextConfig = {
         hostname: "**.amazonaws.com",
       },
     ],
-    domains: ["res.cloudinary.com", "via.placeholder.com", "picsum.photos"],
   },
 
-  // Fix: Use the new configuration format
-  serverExternalPackages: [
-    "@prisma/client",
-    "bcryptjs",
-    "adminjs",
-    "@adminjs/prisma",
-    "@adminjs/express",
-    "esbuild",
-  ],
-
-  // Remove the experimental block entirely since it's deprecated
-  // experimental: {
-  //   serverComponentsExternalPackages: [...],
-  // },
+  // Exclude bcrypt from middleware bundles
+  serverExternalPackages: ["bcrypt"],
 
   webpack: (config, { isServer, dev }) => {
     // Client-side exclusions
@@ -55,21 +42,23 @@ const nextConfig: NextConfig = {
         net: false,
         tls: false,
         crypto: false,
+        stream: false,
+        os: false,
       };
     }
 
-    // Exclude problematic packages from middleware
-    if (isServer && !dev) {
-      config.externals.push(
-        { "openid-client": "commonjs openid-client" },
-        { bcryptjs: "commonjs bcryptjs" }
-      );
-    }
+    // Exclude bcrypt from all bundles that might end up in middleware
+    config.externals = [
+      ...(config.externals || []), "bcrypt"
+      // {
+      //   bcrypt: "commonjs bcrypt",
+      //   "node-gyp-build": "commonjs node-gyp-build",
+      // },
+    ];
 
     return config;
   },
 
-  // Add compiler options to handle type checking
   typescript: {
     ignoreBuildErrors: false,
   },

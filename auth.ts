@@ -1,7 +1,6 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import prisma from "@/lib/prisma";
-import { compare } from "bcryptjs";
 import { LoginSchema } from "./lib/validations/auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { WalletService } from "./lib/services/wallet-service";
@@ -52,8 +51,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             console.log("❌ User not found or no password");
             return null;
           }
+          const bcrypt = require("bcrypt");
 
-          const passwordMatch = await compare(password, user.password);
+          const passwordMatch = await bcrypt.compare(password, user.password);
           console.log("🔐 Password match:", passwordMatch);
 
           if (!passwordMatch) {

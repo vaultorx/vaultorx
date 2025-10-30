@@ -15,16 +15,31 @@ export function useNFTs(params?: FilterOptions) {
       setLoading(true);
       setError(null);
 
-      const response = await nftService.getNFTs(filters || params);
+      // Map frontend sort options to API compatible sort options
+      const apiParams = { ...filters };
+
+      // Ensure sortOrder is properly set based on sortBy
+      if (apiParams.sortBy === "price-low") {
+        apiParams.sortOrder = "asc";
+      } else if (apiParams.sortBy === "price-high") {
+        apiParams.sortOrder = "desc";
+      }
+
+      const response = await nftService.getNFTs(apiParams);
 
       if (response.success) {
         setNfts(response.data);
         setPagination(response.pagination || null);
       } else {
         setError(response.message || "Failed to fetch NFTs");
+        setNfts([]);
+        setPagination(null);
       }
     } catch (err) {
+      console.error("Error fetching NFTs:", err);
       setError(err instanceof Error ? err.message : "An error occurred");
+      setNfts([]);
+      setPagination(null);
     } finally {
       setLoading(false);
     }
@@ -32,7 +47,13 @@ export function useNFTs(params?: FilterOptions) {
 
   useEffect(() => {
     fetchNFTs();
-  }, [params?.search, params?.category, params?.page, params?.sortBy]);
+  }, [
+    params?.search,
+    params?.category,
+    params?.page,
+    params?.sortBy,
+    params?.limit,
+  ]);
 
   return {
     nfts,

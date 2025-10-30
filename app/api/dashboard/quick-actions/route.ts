@@ -35,7 +35,7 @@ export async function GET() {
         title: "Create Auction",
         description: "Start a timed auction",
         icon: "Ticket",
-        href: "/auctions?action=create",
+        href: "/dashboard/auctions?action=create",
         color: "orange",
         enabled: true,
       },

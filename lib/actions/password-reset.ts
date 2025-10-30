@@ -1,6 +1,5 @@
 "use server";
 
-import { z } from "zod";
 import { randomBytes } from "crypto";
 import {
   ForgotPasswordSchema,
@@ -8,7 +7,7 @@ import {
 } from "@/lib/validations/auth";
 import prisma from "@/lib/prisma";
 import { sendPasswordResetEmail } from "@/lib/email";
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
 import { redirect } from "next/navigation";
 
 export async function requestPasswordReset(

@@ -61,34 +61,45 @@ export default function LoginPage() {
       const redirect = searchParams.get("redirect");
       const nftParam = searchParams.get("nft");
 
-      if (redirect && nftParam) {
-        // Redirect to purchase page with NFT data
-        router.push(`${redirect}?nft=${nftParam}`);
-      } else {
-        router.push("/dashboard");
-      }
+      // if (redirect && nftParam) {
+      //   // Redirect to purchase page with NFT data
+      //   router.push(`${redirect}?nft=${nftParam}`);
+      // } else {
+      //   router.push("/dashboard");
+      // }
+
+        if (redirect === "/dashboard/purchase" && nftParam) {
+          // Redirect to purchase page with NFT data
+          router.push(`/dashboard/purchase?nft=${nftParam}`);
+        } else if (redirect) {
+          // Redirect to the specified page
+          router.push(redirect);
+        } else {
+          // Default redirect
+          router.push("/dashboard");
+        }
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-950 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         {/* Back Button */}
         <Button
           variant="ghost"
           onClick={() => router.back()}
-          className="flex items-center gap-2 text-slate-400 hover:text-white"
+          className="flex items-center gap-2 "
         >
           <ArrowLeft className="h-4 w-4" />
           Back
         </Button>
 
-        <Card className="bg-slate-900/50 backdrop-blur-xl border-slate-700/50">
+        <Card className=" backdrop-blur-xl border-slate-700/50">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold text-white">
+            <CardTitle className="text-2xl font-bold">
               Sign in to your account
             </CardTitle>
-            <CardDescription className="text-slate-400">
+            <CardDescription className="text-slate-700">
               {nftData
                 ? `Complete purchase of ${nftData.name}`
                 : "Access your NFT marketplace account"}
@@ -97,7 +108,7 @@ export default function LoginPage() {
 
           <CardContent>
             {nftData && (
-              <div className="mb-6 p-4 bg-slate-800/50 rounded-lg border border-slate-700/50">
+              <div className="mb-6 p-4 rounded-lg border border-slate-300/50">
                 <div className="flex items-center gap-3">
                   <img
                     src={nftData.image}
@@ -105,10 +116,10 @@ export default function LoginPage() {
                     className="w-12 h-12 rounded-lg object-cover"
                   />
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-white">
+                    <p className="text-sm font-medium">
                       {nftData.name}
                     </p>
-                    <p className="text-sm text-slate-400">
+                    <p className="text-sm text-slate-700">
                       {nftData.collectionName}
                     </p>
                     <p className="text-sm text-green-400 font-semibold">
@@ -132,7 +143,7 @@ export default function LoginPage() {
                   <Input
                     {...register("email")}
                     type="email"
-                    className="pl-12 bg-slate-800/50 border-slate-700 text-white placeholder-slate-400"
+                    className="pl-12 bg-slate-800/50 border-slate-700 text-slate-700 placeholder-slate-800"
                     placeholder="Email address"
                   />
                 </div>
@@ -147,12 +158,12 @@ export default function LoginPage() {
                   <Input
                     {...register("password")}
                     type={showPassword ? "text" : "password"}
-                    className="pl-12 bg-slate-800/50 border-slate-700 text-white placeholder-slate-400"
+                    className="pl-12 bg-slate-800/50 border-slate-700 text-slate-700 placeholder-slate-700"
                     placeholder="Password"
                   />
                   <button
                     type="button"
-                    className="absolute right-3 top-3 text-slate-400 hover:text-white"
+                    className="absolute right-3 top-3 text-slate-600 hover:text-slate-800"
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     {showPassword ? (
@@ -175,11 +186,11 @@ export default function LoginPage() {
                     id="remember-me"
                     name="remember-me"
                     type="checkbox"
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-600 bg-slate-700 rounded"
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-700 bg-slate-700 rounded"
                   />
                   <label
                     htmlFor="remember-me"
-                    className="ml-2 block text-sm text-slate-300"
+                    className="ml-2 block text-sm text-slate-600"
                   >
                     Remember me
                   </label>

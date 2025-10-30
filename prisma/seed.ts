@@ -7,7 +7,7 @@ import {
   User,
 } from "@/lib/generated/prisma";
 import { WalletService } from "@/lib/services/wallet-service";
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt"
 import { NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
