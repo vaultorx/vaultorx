@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "postinstall": "pnpm db:generate && pnpm db:deploy:seed",
+    "postinstall": "pnpm db:generate && pnpm db:migrate:deploy",
     "admin": "tsx -r dotenv/config adminjs-server.ts",
     "admin:dev": "tsx watch -r dotenv/config adminjs-server.ts",
     "db:seed": "tsx prisma/seed.ts",

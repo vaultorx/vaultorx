@@ -156,9 +156,9 @@ export default function NFTsPage() {
     <div className="min-h-screen bg-white">
       <Header />
 
-      <main className="pt-24 pb-16">
+      <main className="pt-10 pb-16">
         {/* Hero Section */}
-        <section className="bg-slate-100">
+        <section className="bg-slate-50 py-14">
           <div className="container mx-auto px-4">
             <motion.div
               className="text-center max-w-3xl mx-auto"
