@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "postinstall": "pnpm db:generate && pnpm db:migrate:seed",
+    "postinstall": "pnpm db:generate && pnpm db:deploy:seed",
     "admin": "tsx -r dotenv/config adminjs-server.ts",
     "admin:dev": "tsx watch -r dotenv/config adminjs-server.ts",
     "start:all": "concurrently \"npm run start\" \"npm run admin\"",
