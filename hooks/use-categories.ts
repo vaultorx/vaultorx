@@ -19,8 +19,6 @@ export function useCategories() {
 
       if (response.success) {
         setCategories(response.data);
-      } else {
-        setError(response.message || "Failed to fetch categories");
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");

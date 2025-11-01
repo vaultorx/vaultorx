@@ -25,8 +25,6 @@ export function useCollections(params?: FilterOptions) {
         setCollections(response.data);
         setPagination(response.pagination || null);
         console.log("Fetched collections:", response.data.length);
-      } else {
-        setError(response.message || "Failed to fetch collections");
       }
     } catch (err) {
       console.error("Error fetching collections:", err);

@@ -16,6 +16,14 @@ export async function GET(request: NextRequest) {
     const minPrice = searchParams.get("minPrice");
     const maxPrice = searchParams.get("maxPrice");
 
+    // Validate pagination parameters
+    if (page < 1 || limit < 1) {
+      return NextResponse.json(
+        { error: "Invalid pagination parameters", success: false },
+        { status: 400 }
+      );
+    }
+
     const skip = (page - 1) * limit;
 
     // Build where clause
@@ -39,8 +47,26 @@ export async function GET(request: NextRequest) {
 
     if (minPrice || maxPrice) {
       where.listPrice = {};
-      if (minPrice) where.listPrice.gte = parseFloat(minPrice);
-      if (maxPrice) where.listPrice.lte = parseFloat(maxPrice);
+      if (minPrice) {
+        const minPriceNum = parseFloat(minPrice);
+        if (isNaN(minPriceNum)) {
+          return NextResponse.json(
+            { error: "Invalid minPrice parameter", success: false },
+            { status: 400 }
+          );
+        }
+        where.listPrice.gte = minPriceNum;
+      }
+      if (maxPrice) {
+        const maxPriceNum = parseFloat(maxPrice);
+        if (isNaN(maxPriceNum)) {
+          return NextResponse.json(
+            { error: "Invalid maxPrice parameter", success: false },
+            { status: 400 }
+          );
+        }
+        where.listPrice.lte = maxPriceNum;
+      }
     }
 
     // Map frontend sort options to actual database fields
@@ -92,13 +118,14 @@ export async function GET(request: NextRequest) {
       prisma.nFTItem.count({ where }),
     ]);
 
+    // Empty results are perfectly valid - return success with empty array
     return NextResponse.json({
-      data: nfts,
+      data: nfts || [], // Ensure we always return an array
       pagination: {
         page,
         limit,
-        total,
-        pages: Math.ceil(total / limit),
+        total: total || 0,
+        pages: Math.ceil((total || 0) / limit),
       },
       success: true,
     });
@@ -110,7 +137,6 @@ export async function GET(request: NextRequest) {
     );
   }
 }
-
 
 export async function POST(request: NextRequest) {
   try {
@@ -142,9 +168,25 @@ export async function POST(request: NextRequest) {
     const attributes = formData.get("attributes") as string;
     const imageFile = formData.get("image") as File;
 
+    // Validate required fields
+    if (!name?.trim() || !description?.trim() || !collectionId || !category || !rarity) {
+      return NextResponse.json(
+        { error: "All required fields must be provided", success: false },
+        { status: 400 }
+      );
+    }
+
     if (!imageFile) {
       return NextResponse.json(
         { error: "Image is required", success: false },
+        { status: 400 }
+      );
+    }
+
+    // Validate file type
+    if (!imageFile.type.startsWith('image/')) {
+      return NextResponse.json(
+        { error: "File must be an image", success: false },
         { status: 400 }
       );
     }
@@ -181,8 +223,8 @@ export async function POST(request: NextRequest) {
 
     const nft = await prisma.nFTItem.create({
       data: {
-        name,
-        description,
+        name: name.trim(),
+        description: description.trim(),
         collectionId,
         tokenId,
         ownerId: user.id,
@@ -234,6 +276,23 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Mint NFT error:", error);
+    
+    // Handle specific error cases
+    if (error instanceof Error) {
+      if (error.message.includes('Unique constraint')) {
+        return NextResponse.json(
+          { error: "NFT with similar attributes already exists", success: false },
+          { status: 409 }
+        );
+      }
+      if (error.message.includes('JSON')) {
+        return NextResponse.json(
+          { error: "Invalid attributes format", success: false },
+          { status: 400 }
+        );
+      }
+    }
+    
     return NextResponse.json(
       { error: "Failed to mint NFT", success: false },
       { status: 500 }

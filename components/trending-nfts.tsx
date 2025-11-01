@@ -122,7 +122,7 @@ export function TrendingNFTs() {
             key="all"
             className={`px-4 py-3 rounded-xl font-medium text-sm capitalize transition-all flex items-center gap-2 ${
               activeCategory === "all"
-                ? "bg-blue-600 shadow-md"
+                ? "shadow-md"
                 : "text-gray-600 hover:text-gray-900 bg-white hover:bg-gray-50 border border-gray-200"
             }`}
             whileHover={{ scale: 1.05, y: -2 }}
@@ -139,7 +139,7 @@ export function TrendingNFTs() {
                 key={category.id}
                 className={`px-4 py-3 rounded-xl font-medium text-sm capitalize transition-all flex items-center gap-2 ${
                   activeCategory === category.id
-                    ? `bg-blue-600 shadow-md`
+                    ? `shadow-md`
                     : "text-gray-600 hover:text-gray-900 bg-white hover:bg-gray-50 border border-gray-200"
                 }`}
                 whileHover={{ scale: 1.05, y: -2 }}

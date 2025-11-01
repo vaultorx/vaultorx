@@ -20,8 +20,6 @@ export function useAuctions(params?: FilterOptions) {
       if (response.success) {
         setAuctions(response.data);
         setPagination(response.pagination || null);
-      } else {
-        setError(response.message || "Failed to fetch auctions");
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");

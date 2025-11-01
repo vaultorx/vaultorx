@@ -25,6 +25,7 @@ import {
   Wallet,
   AlertCircle,
   CreditCard,
+  Gavel,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -32,14 +33,26 @@ import { toast } from "sonner";
 interface NFTData {
   id: string;
   name: string;
-  price: number;
-  image: string;
-  collectionName: string;
-  currency: string;
-  owner?: string;
   description?: string;
+  image: string;
+  collection: {
+    name: string;
+    verified: boolean;
+  };
+  owner: {
+    username: string;
+  };
+  isListed: boolean;
+  listPrice?: number;
+  currency: string;
   rarity?: string;
-  attributes?: any;
+  auctions?: Array<{
+    id: string;
+    type: string;
+    status: string;
+    startingPrice: number;
+    minimumBid: number;
+  }>;
 }
 
 interface PurchaseSession {
@@ -48,14 +61,12 @@ interface PurchaseSession {
   amount: number;
   currency: string;
   expiresAt: string;
-  transactionHash?: string;
   nftItem: {
     id: string;
     name: string;
     image: string;
     collection: {
       name: string;
-      contractAddress: string;
     };
     owner: {
       username: string;
@@ -74,7 +85,6 @@ export default function PurchasePage() {
   const [processing, setProcessing] = useState(false);
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [transactionHash, setTransactionHash] = useState("");
-
   const [userWallet, setUserWallet] = useState("");
 
   // Fetch user's assigned wallet
@@ -97,9 +107,7 @@ export default function PurchasePage() {
     }
   };
 
-  // Replace the platformWallet constant with:
-  const platformWallet =
-    userWallet || "";
+  const platformWallet = userWallet || "";
 
   useEffect(() => {
     if (status === "loading") return;
@@ -107,7 +115,11 @@ export default function PurchasePage() {
     if (status === "unauthenticated") {
       const nftParam = searchParams.get("nft");
       if (nftParam) {
-        router.push(`/login?redirect=/dashboard/purchase&nft=${nftParam}`);
+        router.push(
+          `/login?redirect=/dashboard/purchase&nft=${encodeURIComponent(
+            nftParam
+          )}`
+        );
       } else {
         router.push("/login");
       }
@@ -115,10 +127,11 @@ export default function PurchasePage() {
     }
 
     initializePurchase();
-  }, [status, searchParams]);
+  }, [status, searchParams, router]);
 
   const initializePurchase = async () => {
     try {
+      setLoading(true);
       const nftParam = searchParams.get("nft");
 
       if (!nftParam) {
@@ -128,7 +141,9 @@ export default function PurchasePage() {
       const decodedNft = JSON.parse(decodeURIComponent(nftParam));
       setNftData(decodedNft);
 
-      // Create or get purchase session
+      console.log("Initializing purchase for NFT:", decodedNft.id);
+
+      // Create purchase session
       const response = await fetch("/api/purchase-sessions", {
         method: "POST",
         headers: {
@@ -136,9 +151,6 @@ export default function PurchasePage() {
         },
         body: JSON.stringify({
           nftItemId: decodedNft.id,
-          amount: decodedNft.price,
-          currency: decodedNft.currency,
-          nftData: decodedNft,
         }),
       });
 
@@ -148,12 +160,13 @@ export default function PurchasePage() {
         setPurchaseSession(result.data);
         const expiresAt = new Date(result.data.expiresAt).getTime();
         setTimeLeft(Math.max(0, expiresAt - Date.now()));
+        toast.success("Purchase session created");
       } else {
         throw new Error(result.error || "Failed to create purchase session");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Purchase initialization error:", error);
-      toast.error("Failed to initialize purchase");
+      toast.error(error.message || "Failed to initialize purchase");
     } finally {
       setLoading(false);
     }
@@ -201,6 +214,11 @@ export default function PurchasePage() {
       return;
     }
 
+    if (!transactionHash.startsWith("0x") || transactionHash.length !== 66) {
+      toast.error("Please enter a valid transaction hash (0x...)");
+      return;
+    }
+
     setProcessing(true);
     try {
       const response = await fetch("/api/purchase-sessions/confirm", {
@@ -224,33 +242,75 @@ export default function PurchasePage() {
       } else {
         throw new Error(result.error || "Failed to submit transaction");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Transaction submission error:", error);
-      toast.error("Failed to submit transaction");
+      toast.error(error.message || "Failed to submit transaction");
     } finally {
       setProcessing(false);
     }
   };
 
+  // Determine purchase type and price
+  const getPurchaseDetails = () => {
+    if (!nftData) return null;
+
+    const hasAuction = nftData.auctions && nftData.auctions.length > 0;
+    const isDirectSale = nftData.isListed && nftData.listPrice;
+
+    let purchaseType = "";
+    let purchasePrice = 0;
+
+    if (isDirectSale) {
+      purchaseType = "Direct Sale";
+      purchasePrice = nftData.listPrice!;
+    } else if (hasAuction) {
+      purchaseType = "Auction Buy Now";
+      purchasePrice = nftData.auctions![0].startingPrice;
+    }
+
+    const platformFee = purchasePrice * 0.025;
+    const totalAmount = purchasePrice + platformFee;
+
+    return {
+      purchaseType,
+      purchasePrice,
+      platformFee,
+      totalAmount,
+      hasAuction,
+      isDirectSale,
+    };
+  };
+
+  const purchaseDetails = getPurchaseDetails();
+
   if (loading) {
     return (
-      <div className="min-h-screen">
+      <div className="min-h-screen bg-white">
+        <Header />
         <div className="pt-24 px-4 sm:px-10 min-h-screen flex items-center justify-center">
-          <div>Initializing purchase...</div>
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Initializing purchase...</p>
+          </div>
         </div>
       </div>
     );
   }
 
-  if (!nftData || !purchaseSession) {
+  if (!nftData || !purchaseSession || !purchaseDetails) {
     return (
-      <div className="min-h-screen">
+      <div className="min-h-screen bg-white">
+        <Header />
         <div className="pt-24 px-4 sm:px-10 min-h-screen flex items-center justify-center">
-          <div className="text-center">
+          <div className="text-center max-w-md">
             <div className="text-6xl mb-4">🔍</div>
-            <h3 className="text-xl font-semibold mb-2">Purchase Not Found</h3>
-            <p className="text-slate-900 mb-4">
-              The purchase session could not be initialized.
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              Purchase Not Available
+            </h3>
+            <p className="text-gray-600 mb-6">
+              {!nftData
+                ? "The NFT data could not be loaded."
+                : "This NFT is not available for purchase at the moment."}
             </p>
             <Button onClick={() => router.push("/marketplace")}>
               Browse Marketplace
@@ -261,12 +321,12 @@ export default function PurchasePage() {
     );
   }
 
-  const totalAmount = nftData.price * 1.025; // Including 2.5% platform fee
-
   return (
-    <div className="min-h-screen">
-      <div className="pt-6 px-4 sm:px-10">
-        <div className="container mx-auto py-8 max-w-4xl">
+    <div className="min-h-screen bg-white">
+      <Header />
+
+      <main className="pt-24 pb-16">
+        <div className="container mx-auto px-4 max-w-6xl">
           {/* Back Button */}
           <Button
             variant="ghost"
@@ -282,21 +342,21 @@ export default function PurchasePage() {
             <motion.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-6 p-4 bg-amber-500/10 border border-amber-500/80 rounded-lg"
+              className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg"
             >
               <div className="flex items-center gap-3">
-                <Clock className="h-5 w-5 text-amber-500" />
+                <Clock className="h-5 w-5 text-amber-600" />
                 <div className="flex-1">
-                  <p className="text-amber-500 font-semibold">
+                  <p className="text-amber-800 font-semibold">
                     Complete your purchase within {formatTime(timeLeft)}
                   </p>
-                  <p className="text-amber-500/80 text-sm">
+                  <p className="text-amber-700 text-sm">
                     Your purchase session will expire after 30 minutes
                   </p>
                 </div>
                 <Badge
                   variant="secondary"
-                  className="text-amber-500 border-amber-500/90"
+                  className="text-amber-800 bg-amber-100 border-amber-300"
                 >
                   {formatTime(timeLeft)}
                 </Badge>
@@ -307,9 +367,9 @@ export default function PurchasePage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* NFT Preview */}
             <div className="space-y-6">
-              <Card className="bg-slate-900/90 backdrop-blur-xl border-slate-700/80">
+              <Card>
                 <CardHeader>
-                  <CardTitle className="text-white">NFT Preview</CardTitle>
+                  <CardTitle>NFT Preview</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="aspect-square rounded-lg overflow-hidden mb-4">
@@ -320,54 +380,66 @@ export default function PurchasePage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <h2 className="text-2xl font-bold text-white">
+                    <h2 className="text-2xl font-bold text-gray-900">
                       {nftData.name}
                     </h2>
-                    <p className="text-slate-400">{nftData.collectionName}</p>
-                    {nftData.rarity && (
-                      <div className="inline-block px-3 py-1 bg-purple-500/20 text-purple-400 rounded-full text-sm">
-                        {nftData.rarity}
-                      </div>
+                    <p className="text-gray-600">{nftData.collection.name}</p>
+                    {nftData.collection.verified && (
+                      <Badge
+                        variant="secondary"
+                        className="bg-blue-100 text-blue-700"
+                      >
+                        Verified
+                      </Badge>
                     )}
-                    {nftData.owner && (
-                      <p className="text-sm text-slate-400">
-                        Owned by {nftData.owner}
-                      </p>
+                    {purchaseDetails.hasAuction && (
+                      <Badge
+                        variant="secondary"
+                        className="bg-purple-100 text-purple-700 flex items-center gap-1 w-fit"
+                      >
+                        <Gavel className="h-3 w-3" />
+                        Auction
+                      </Badge>
                     )}
+                    <p className="text-sm text-gray-500">
+                      Owned by {nftData.owner.username}
+                    </p>
                   </div>
                 </CardContent>
               </Card>
 
               {/* Platform Wallet Card */}
-              <Card className="bg-slate-900/90 backdrop-blur-xl border-slate-700/80">
+              <Card>
                 <CardHeader className="pb-4">
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <CreditCard className="h-5 w-5 text-blue-400" />
+                  <CardTitle className="flex items-center gap-2">
+                    <CreditCard className="h-5 w-5 text-blue-600" />
                     Platform Wallet
                   </CardTitle>
-                  <CardDescription className="text-slate-400">
+                  <CardDescription className="text-gray-600">
                     Send payment to this secure platform wallet address
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg border border-slate-700/50">
-                      <code className="text-sm text-white font-mono flex-1 truncate">
-                        {platformWallet}
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+                      <code className="text-sm text-gray-900 font-mono flex-1 truncate">
+                        {platformWallet || "Loading wallet address..."}
                       </code>
-                      <div className="flex items-center gap-1">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => copyToClipboard(platformWallet)}
-                          className="h-8 w-8 p-0 hover:bg-slate-700/50"
-                        >
-                          <Copy className="h-3.5 w-3.5 text-white" />
-                        </Button>
-                      </div>
+                      {platformWallet && (
+                        <div className="flex items-center gap-1">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => copyToClipboard(platformWallet)}
+                            className="h-8 w-8 p-0 hover:bg-gray-200"
+                          >
+                            <Copy className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      )}
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-slate-400">
-                      <Shield className="h-3 w-3 text-green-400" />
+                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                      <Shield className="h-3 w-3 text-green-600" />
                       <span>Verified platform wallet • Secure escrow</span>
                     </div>
                   </div>
@@ -375,34 +447,38 @@ export default function PurchasePage() {
               </Card>
             </div>
 
-            {/* Payment Instructions */}
-            {/* Payment Details Card */}
-            <Card className="bg-slate-900/90 backdrop-blur-xl border-slate-700/80">
+            {/* Payment Details */}
+            <Card>
               <CardHeader>
-                <CardTitle className="text-white">Complete Purchase</CardTitle>
-                <CardDescription className="text-slate-400">
-                  Send payment and confirm your transaction
+                <CardTitle>Complete Purchase</CardTitle>
+                <CardDescription className="text-gray-600">
+                  {purchaseDetails.purchaseType} • Send payment and confirm your
+                  transaction
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Price Summary */}
-                <div className="space-y-3 p-4 bg-slate-800/30 rounded-lg">
+                <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
                   <div className="flex justify-between items-center">
-                    <span className="text-slate-400">Item Price</span>
-                    <span className="text-white font-semibold">
-                      {nftData.price} {nftData.currency}
+                    <span className="text-gray-600">Item Price</span>
+                    <span className="text-gray-900 font-semibold">
+                      {purchaseDetails.purchasePrice} {nftData.currency}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-slate-400">Platform Fee (2.5%)</span>
-                    <span className="text-white font-semibold">
-                      {(nftData.price * 0.025).toFixed(4)} {nftData.currency}
+                    <span className="text-gray-600">Platform Fee (2.5%)</span>
+                    <span className="text-gray-900 font-semibold">
+                      {purchaseDetails.platformFee.toFixed(4)}{" "}
+                      {nftData.currency}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center border-t border-slate-700 pt-3">
-                    <span className="text-white font-bold">Total Amount</span>
-                    <span className="text-white font-bold text-lg">
-                      {totalAmount.toFixed(4)} {nftData.currency}
+                  <div className="flex justify-between items-center border-t border-gray-300 pt-3">
+                    <span className="text-gray-900 font-bold">
+                      Total Amount
+                    </span>
+                    <span className="text-gray-900 font-bold text-lg">
+                      {purchaseDetails.totalAmount.toFixed(4)}{" "}
+                      {nftData.currency}
                     </span>
                   </div>
                 </div>
@@ -410,30 +486,31 @@ export default function PurchasePage() {
                 {/* Payment Instructions */}
                 <div className="space-y-4">
                   <div className="flex items-start gap-3">
-                    <Wallet className="h-5 w-5 text-blue-400 mt-0.5" />
+                    <Wallet className="h-5 w-5 text-blue-600 mt-0.5" />
                     <div className="flex-1">
-                      <p className="text-white font-semibold mb-2">
-                        Send exactly {totalAmount.toFixed(4)} {nftData.currency}{" "}
-                        to the platform wallet
+                      <p className="text-gray-900 font-semibold mb-2">
+                        Send exactly {purchaseDetails.totalAmount.toFixed(4)}{" "}
+                        {nftData.currency} to the platform wallet
                       </p>
-                      <p className="text-slate-400 text-sm">
+                      <p className="text-gray-600 text-sm">
                         Use the wallet address shown above. Make sure to send
                         the exact amount.
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-3 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
-                    <AlertCircle className="h-5 w-5 text-amber-400 mt-0.5 shrink-0" />
+                  <div className="flex items-start gap-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                    <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5 shrink-0" />
                     <div className="flex-1">
-                      <p className="text-amber-400 text-sm font-medium mb-1">
+                      <p className="text-amber-800 text-sm font-medium mb-1">
                         Important Payment Instructions
                       </p>
-                      <ul className="text-amber-400/80 text-sm space-y-1">
+                      <ul className="text-amber-700 text-sm space-y-1">
                         <li>• Include the transaction hash after payment</li>
                         <li>• Do not send from exchanges</li>
                         <li>• Use only compatible wallets</li>
                         <li>• Double-check the wallet address</li>
+                        <li>• Transaction must be confirmed on blockchain</li>
                       </ul>
                     </div>
                   </div>
@@ -441,29 +518,29 @@ export default function PurchasePage() {
 
                 {/* Transaction Hash Input */}
                 <div className="space-y-3">
-                  <label className="text-sm font-medium text-white">
+                  <label className="text-sm font-medium text-gray-900">
                     Transaction Hash
                   </label>
                   <Input
                     placeholder="Enter your transaction hash (0x...)"
                     value={transactionHash}
                     onChange={(e) => setTransactionHash(e.target.value)}
-                    className="bg-slate-800/50 border-slate-700 text-white placeholder-slate-400 focus:border-blue-500 focus:ring-blue-500"
+                    className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                   />
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-gray-500">
                     Paste the transaction hash from your wallet after sending
                     the payment
                   </p>
                 </div>
 
                 {/* Security Features */}
-                <div className="flex items-center justify-between p-3 bg-slate-800/30 rounded-lg">
-                  <div className="flex items-center gap-3 text-sm text-slate-400">
-                    <Shield className="h-4 w-4 text-green-400" />
+                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center gap-3 text-sm text-gray-600">
+                    <Shield className="h-4 w-4 text-green-600" />
                     <span>Secure escrow protection</span>
                   </div>
-                  <div className="flex items-center gap-3 text-sm text-slate-400">
-                    <CheckCircle className="h-4 w-4 text-green-400" />
+                  <div className="flex items-center gap-3 text-sm text-gray-600">
+                    <CheckCircle className="h-4 w-4 text-green-600" />
                     <span>Admin verified</span>
                   </div>
                 </div>
@@ -472,9 +549,12 @@ export default function PurchasePage() {
                 <Button
                   onClick={handleTransactionSubmit}
                   disabled={
-                    processing || !transactionHash.trim() || timeLeft <= 0
+                    processing ||
+                    !transactionHash.trim() ||
+                    timeLeft <= 0 ||
+                    !platformWallet
                   }
-                  className="w-full bg-blue-500 hover:bg-blue-600 text-white gap-2 py-6 text-lg transition-colors duration-200"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white gap-2 py-6 text-lg"
                 >
                   {processing ? (
                     <>
@@ -490,7 +570,7 @@ export default function PurchasePage() {
                 </Button>
 
                 {/* Terms */}
-                <p className="text-xs text-slate-500 text-center">
+                <p className="text-xs text-gray-500 text-center">
                   By completing this purchase, you agree to our Terms of
                   Service. The NFT will be transferred to your wallet after
                   admin confirmation.
@@ -499,7 +579,7 @@ export default function PurchasePage() {
             </Card>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

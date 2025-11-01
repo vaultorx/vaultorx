@@ -60,6 +60,18 @@ const SAMPLE_COLLECTIONS = [
     description: "A community of NFT enthusiasts and collectors",
     royalty: 7.5,
   },
+  {
+    name: "Pudgy Penguins",
+    symbol: "PPG",
+    description: "8,888 unique penguins spreading good vibes across the meta.",
+    royalty: 5.0,
+  },
+  {
+    name: "Azuki",
+    symbol: "AZUKI",
+    description: "A brand born at the intersection of art, technology, and culture.",
+    royalty: 8.0,
+  },
 ];
 
 const NFT_CATEGORIES = [
@@ -239,8 +251,48 @@ function calculatePrice(rarity: Rarity): number {
   return basePrices[rarity] * variation;
 }
 
+async function checkIfDatabaseIsEmpty(): Promise<boolean> {
+  try {
+    // Check multiple tables to determine if database has data
+    const [
+      userCount,
+      collectionCount,
+      nftCount,
+      auctionCount,
+      transactionCount
+    ] = await Promise.all([
+      prisma.user.count(),
+      prisma.collection.count(),
+      prisma.nFTItem.count(),
+      prisma.auction.count(),
+      prisma.transaction.count()
+    ]);
+
+    const totalCount = userCount + collectionCount + nftCount + auctionCount + transactionCount;
+    
+    console.log(`📊 Database check - Users: ${userCount}, Collections: ${collectionCount}, NFTs: ${nftCount}, Auctions: ${auctionCount}, Transactions: ${transactionCount}`);
+    
+    // Consider database empty if there are less than 10 total records across all tables
+    // This allows for some minimal data while still preventing full reseeding
+    return totalCount < 10;
+  } catch (error) {
+    console.error("❌ Error checking database status:", error);
+    // If we can't check, assume it's empty to be safe
+    return true;
+  }
+}
+
 async function main() {
   console.log("🌱 Starting comprehensive database seeding...");
+
+  // Check if database already has data
+  const isEmpty = await checkIfDatabaseIsEmpty();
+  if (!isEmpty) {
+    console.log("✅ Database already contains data. Skipping seeding to avoid duplicates.");
+    return;
+  }
+
+  console.log("🆕 Database is empty. Proceeding with seeding...");
 
   // Check database connection
   try {

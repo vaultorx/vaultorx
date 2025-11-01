@@ -31,9 +31,7 @@ export function useExhibitions(params?: FilterOptions) {
       if (response.success) {
         setExhibitions(response.data);
         setPagination(response.pagination || null);
-      } else {
-        setError(response.message || "Failed to fetch exhibitions");
-      }
+      } 
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {

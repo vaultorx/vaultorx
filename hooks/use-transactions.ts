@@ -22,8 +22,6 @@ export function useTransactions(params?: FilterOptions) {
       if (response.success) {
         setTransactions(response.data);
         setPagination(response.pagination || null);
-      } else {
-        setError(response.message || "Failed to fetch transactions");
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");

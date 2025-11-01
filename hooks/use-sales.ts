@@ -105,8 +105,6 @@ export function useSalesStats() {
           activeListings,
           soldThisMonth,
         });
-      } else {
-        setError(response.message || "Failed to fetch sales stats");
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");

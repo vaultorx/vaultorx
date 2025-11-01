@@ -123,7 +123,7 @@ export default function NFTsPage() {
       params.set("category", selectedCategory);
     }
 
-    const newUrl = params.toString() ? `/nft?${params.toString()}` : "/nfts";
+    const newUrl = params.toString() ? `/nft?${params.toString()}` : "/nft";
     router.replace(newUrl, { scroll: false });
   }, [selectedCategory, router]);
 
@@ -158,7 +158,7 @@ export default function NFTsPage() {
 
       <main className="pt-24 pb-16">
         {/* Hero Section */}
-        <section className="bg-gradient-to-br from-blue-50 to-indigo-100 py-16">
+        <section className="bg-slate-100">
           <div className="container mx-auto px-4">
             <motion.div
               className="text-center max-w-3xl mx-auto"

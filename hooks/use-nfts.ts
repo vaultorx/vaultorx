@@ -30,10 +30,6 @@ export function useNFTs(params?: FilterOptions) {
       if (response.success) {
         setNfts(response.data);
         setPagination(response.pagination || null);
-      } else {
-        setError(response.message || "Failed to fetch NFTs");
-        setNfts([]);
-        setPagination(null);
       }
     } catch (err) {
       console.error("Error fetching NFTs:", err);
